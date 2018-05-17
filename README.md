@@ -3,7 +3,7 @@ Atoms for the MegaDrive (Genesis)!
 ![](https://www.dropbox.com/s/ljam6tgxphunlve/MegaAtoms.png?raw=1)
 
 This is the source code and release of MegaAtoms, which is documented as part of a youtube series
-[GouldFish On Games](https://www.youtube.com/channel/UC5Ee7qQWiSZDcdTnXB6fBfw)
+[GouldFish On Games](https://www.youtube.com/watch?v=Mh6SBBHMiFI)
 
 This is using [SGDK](https://github.com/Stephane-D/SGDK)
 
