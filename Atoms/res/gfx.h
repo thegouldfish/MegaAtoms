@@ -21,5 +21,7 @@ extern const Image winner_ai3;
 extern const Image winner_ai4;
 extern const Image winner_ai5;
 extern const Image winner_ai6;
+extern const Image tutorial_backing;
+extern const Image tutorial_backing_2;
 
 #endif // _RES_GFX_H_

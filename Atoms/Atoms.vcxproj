@@ -89,6 +89,7 @@
     <ClInclude Include="inc\PlayerSelectState.h" />
     <ClInclude Include="inc\SimpleState.h" />
     <ClInclude Include="inc\Title.h" />
+    <ClInclude Include="inc\TutorialState.h" />
     <ClInclude Include="inc\WinnerScreen.h" />
     <ClInclude Include="res\gfx.h" />
     <ClInclude Include="res\sound.h" />
@@ -112,6 +113,7 @@
     <ClCompile Include="src\PlayerSelectState.c" />
     <ClCompile Include="src\SimpleState.c" />
     <ClCompile Include="src\Title.c" />
+    <ClCompile Include="src\TutorialState.c" />
     <ClCompile Include="src\WinnerScreen.c" />
     <Resource Include="src\boot\sega.s">
       <FileType>Text</FileType>

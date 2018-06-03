@@ -23,7 +23,7 @@ void WinnerScreenStart()
 
 
 	//VDP_setPalette(PAL0, ingame_back.palette->data);
-	VDP_drawImageEx(PLAN_B, &winner_background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA);
+	VDP_drawImageEx(PLAN_B, &winner_background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, CPU);
 	ind += winner_background.tileset->numTile;
 
 	

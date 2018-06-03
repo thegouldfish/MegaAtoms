@@ -12,9 +12,6 @@
 
 int m_AtomTileStart;
 
-int m_LastCursorX = 0;
-int m_LastCursorY = 0;
-
 int m_CursorX = 0;
 int m_CursorY = 0;
 
@@ -50,6 +47,43 @@ int m_PlayerSetup[7];
 #define SND_EXPLODE 69
 
 
+
+typedef struct 
+{
+	int Start;
+	int Count;
+	int FrameRate;
+	int Loop;
+}anim;
+
+anim m_Animations[] = 
+{
+	{1,4,2,0}, // Grow to 1
+	{4,4,2,0 }, // Grow to 2
+	{8,4,2,0 }, // Grow to 3
+	
+	{13,5,2,1}, // Idle 1
+	{19,5,2,1}, // Idle 2
+
+	{25,4,3,1}, // Crit 1
+	{29,4,3,1}, // Crit 2	
+	{33,4,3,1}, // Crit 3
+
+	{37,4,2,0} // Explode
+};
+
+
+
+typedef struct
+{
+	int X;
+	int Y;
+}Point;
+
+
+
+
+
 struct GridSquare
 {
 	int Player;
@@ -60,8 +94,17 @@ struct GridSquare
 	int Explode;
 
 	int Animate;
+	int Frame;
+	int FrameCounter;
 } m_PlayerGrid[70];
 
+
+
+
+
+
+
+Point m_CursorPositions[7];
 
 
 void GridSetup()
@@ -74,7 +117,6 @@ void GridSetup()
 		for (x = 0; x<10; x++)
 		{
 			m_PlayerGrid[i].Player = 0;
-
 
 			if (y == 0 && x == 0)
 			{
@@ -121,26 +163,61 @@ void GridSetup()
 
 void DrawAtom(int player, int x, int y, int size)
 {
-	int row = 0;
-	int column = 0;
-
 	if (player < 0)
 	{
 		player = 0;
 		size = 0;
 	}
 
-	u16 t = (3 * size) + (player * 3 * 18);
-	for (row = 0; row < 3; row++)
+	int startingFrame = 0;
+	int animate = m_PlayerGrid[(y * 10) + x].Animate;
+	if (animate >= 0)
 	{
-		for (column = 0; column < 3; column++)
+		anim* details = &m_Animations[animate];
+		m_PlayerGrid[(y * 10) + x].FrameCounter++;
+
+		if (m_PlayerGrid[(y * 10) + x].FrameCounter > details->FrameRate)
+		{
+			m_PlayerGrid[(y * 10) + x].Frame++;
+			m_PlayerGrid[(y * 10) + x].FrameCounter = 0;
+		}			
+
+		if (m_PlayerGrid[(y * 10) + x].Frame >= details->Count)
+		{
+			if (details->Loop)
+			{
+				m_PlayerGrid[(y * 10) + x].Frame = 0;
+			}
+			else
+			{
+				m_PlayerGrid[(y * 10) + x].Animate = -1;
+				m_PlayerGrid[(y * 10) + x].Frame = details->Count -1;
+			}
+		}
+		startingFrame = (details->Start + m_PlayerGrid[(y * 10) + x].Frame);
+	}
+	else
+	{
+		if (size == 4)
+		{
+			startingFrame = 39;
+		}
+		else
+		{
+			startingFrame = size * 4;
+		}
+	}
+	
+	u16 t = (startingFrame * 3 * 6 * 3) + (player * 3);
+	for (int row = 0; row < 3; row++)
+	{
+		for (int column = 0; column < 3; column++)
 		{
 			u16 tile = m_AtomTileStart;
 			if (size != 0)
 			{
 				tile += atoms.map->tilemap[t];
 			}
-
 			VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, tile), column + (x * 3), row + (y * 3));
 			t++;
 		}
@@ -160,6 +237,8 @@ void SetupGame()
 		m_PlayerGrid[i].GrowSize = 0;
 		m_PlayerGrid[i].Player = 0;
 		m_PlayerGrid[i].Size = 0;
+		m_PlayerGrid[i].Animate = -1;
+		m_PlayerGrid[i].Frame = 0;
 	}
 
 	// Reset the Player
@@ -170,17 +249,24 @@ void SetupGame()
 
 	m_TurnCount = 0;
 
-	for (i = 0; i<7; i++)
-	{
-		
-		// Set each player to be human for now
-		//m_PlayerSetup[i] = 1;
-		m_Alive[i] = 0;
+	for (i = 0; i < 7; i++)
+	{		
+		if (m_PlayerSetup[i])
+		{
+			m_Alive[i] = 1;
+		}
+		else
+		{
+			m_Alive[i] = 0;
+		}
 
 		if (m_CurrentPlayer == 0 && m_PlayerSetup[i] != 0)
 		{
 			m_CurrentPlayer = i;
 		}
+
+		m_CursorPositions[i].X = -1;
+		m_CursorPositions[i].Y = -1;
 	}
 
 
@@ -294,6 +380,50 @@ int SizeAtSquare(int x, int y)
 }
 
 
+
+void EnableLoopingAnims()
+{
+	int y = 0;
+	int x = 0;
+	for (y = 0; y < 7; y++)
+	{
+		for (x = 0; x < 10; x++)
+		{						
+			if (m_PlayerGrid[(y * 10) + x].Player == m_CurrentPlayer)
+			{
+				int size = m_PlayerGrid[(y * 10) + x].Size;
+				if (size + 1 == m_PlayerGrid[(y * 10) + x].MaxSize)
+				{
+					m_PlayerGrid[(y * 10) + x].Animate = 4 + size;
+				}
+				else
+				{
+					m_PlayerGrid[(y * 10) + x].Animate = 2 + size;
+				}
+
+				m_PlayerGrid[(y * 10) + x].Frame = 0;
+				m_PlayerGrid[(y * 10) + x].FrameCounter = 0;
+			}
+		}
+	}
+}
+
+void DisableLoopingAnims()
+{
+	int y = 0;
+	int x = 0;
+	for (y = 0; y < 7; y++)
+	{
+		for (x = 0; x < 10; x++)
+		{			
+			m_PlayerGrid[(y * 10) + x].Animate = -1;
+			m_PlayerGrid[(y * 10) + x].Frame = 0;
+			m_PlayerGrid[(y * 10) + x].FrameCounter = 0;
+		}
+	}
+}
+
+
 void AnimateScreen()
 {
 	u8 animating = 1;
@@ -323,7 +453,9 @@ void AnimateScreen()
 					done = 0;
 				}
 
+				
 				m_PlayerGrid[j].Size += m_PlayerGrid[j].GrowSize;
+
 				if (m_PlayerGrid[j].Size > m_PlayerGrid[j].MaxSize)
 				{
 					m_PlayerGrid[j].GrowSize = m_PlayerGrid[j].Size - m_PlayerGrid[j].MaxSize;
@@ -333,12 +465,17 @@ void AnimateScreen()
 				{
 					m_PlayerGrid[j].GrowSize = 0;
 				}
+
+				m_PlayerGrid[j].Animate = m_PlayerGrid[j].Size - 1;
 			}
 		}
 
-		for (j = 0; j<7; j++)
+		if (m_TurnCount)
 		{
-			m_Alive[j] = 0;
+			for (j = 0; j < 7; j++)
+			{
+				m_Alive[j] = 0;
+			}
 		}
 
 		for (y = 0; y < 7; y++)
@@ -359,7 +496,10 @@ void AnimateScreen()
 					allSame = 0;
 				}
 
-				m_Alive[player]++;
+				if (m_TurnCount)
+				{
+					m_Alive[player]++;
+				}
 
 				if (m_PlayerGrid[i].Changed)
 				{
@@ -371,6 +511,7 @@ void AnimateScreen()
 						m_PlayerGrid[i].Changed = 1;
 						m_PlayerGrid[i].Size = 5;
 						exploded = 1;
+						m_PlayerGrid[i].Animate = 8;
 					}
 					else if (size == 5)
 					{
@@ -481,19 +622,8 @@ void AnimateScreen()
 }
 
 
-u8 m_CurrentType = 0;
-u8 m_CurrentId = 0;
-
-u8 m_NextType = 0;
-u8 m_NextId = 0;
-
 void UpdateUpNext()
 {
-	Sprite* prevCurrent = m_Current;
-	Sprite* prevNext = m_Next;
-
-	u8 updateCurrent = FALSE;
-	u8 updateNext = FALSE;
 
 	int next = m_CurrentPlayer;
 
@@ -513,100 +643,44 @@ void UpdateUpNext()
 			break;
 		}
 
-		if (m_PlayerSetup[next] != 0)
+		if (m_PlayerSetup[next] != 0 && m_Alive[next])
 		{
 			break;
 		}
 	}
-
-
-	if (m_CurrentPlayer != m_CurrentId)
-	{
-		updateCurrent = TRUE;
-	}
-	if (m_PlayerSetup[m_CurrentPlayer] == m_CurrentType)
-	{
-		updateCurrent = TRUE;
-	}
-
-	if (next != m_NextId)
-	{
-		updateNext = TRUE;
-	}
-	if (m_PlayerSetup[next] == m_NextType)
-	{
-		updateNext = TRUE;
-	}
-
 	
-	if (updateCurrent)
+	if (m_PlayerSetup[m_CurrentPlayer] == 1)
 	{
-		SPR_setVisibility(prevCurrent, HIDDEN);
-		if (m_PlayerSetup[m_CurrentPlayer] == 1)
-		{
-			m_Current = SPR_addSprite(&profs_player, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
-		}
-		else
-		{
-			m_Current = SPR_addSprite(&profs_robot, 0, 0, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
-		}
-		SPR_setPosition(m_Current, 2, 52);
 		SPR_setAnim(m_Current, m_CurrentPlayer - 1);
+		SPR_setPalette(m_Current, PAL2);
 	}
+	else if(m_PlayerSetup[m_CurrentPlayer] == 2)
+	{
+		SPR_setAnim(m_Current, m_CurrentPlayer -1 + 6);
+		SPR_setPalette(m_Current, PAL3);
+	}		
+
 
 
 
 
 	if (next != -1)
 	{
-		if (updateNext)
+		if (m_PlayerSetup[next] == 1)
 		{
-			SPR_setVisibility(prevNext, HIDDEN);
-			if (m_PlayerSetup[next] == 1)
-			{
-				m_Next = SPR_addSprite(&profs_player, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
-			}
-			else
-			{
-				m_Next = SPR_addSprite(&profs_robot, 0, 0, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
-			}
-			SPR_setPosition(m_Next, 2, 124);
 			SPR_setAnim(m_Next, next - 1);
+			SPR_setPalette(m_Next, PAL2);
 		}
-	}
-	
-	if (updateCurrent && updateNext)
-	{
-		SPR_update();
-		
-		//VDP_waitVSync();
-	}
-	
-
-	if (prevCurrent != NULL)
-	{
-		if (updateCurrent)
+		else if (m_PlayerSetup[next] == 2)
 		{
-			SPR_releaseSprite(prevCurrent);
-			m_CurrentId = m_CurrentPlayer;
-			m_CurrentType = m_PlayerSetup[m_CurrentPlayer];
-		}
+			SPR_setAnim(m_Next, next -1 + 6);
+			SPR_setPalette(m_Next, PAL3);
+		}			
 	}
-
-	if (prevNext != NULL)
-	{
-		if (updateNext)
-		{
-			SPR_releaseSprite(prevNext);
-			m_NextId = next;
-			m_NextType = m_PlayerSetup[next];
-		}
-	}
-
-
-	//SPR_update();
 }
 
+
+ 
 
 
 void AtomGameStart()
@@ -659,8 +733,8 @@ void AtomGameStart()
 	// prepare palettes
 	memcpy(&palette[0], ingame_back.palette->data, 16 * 2);
 	memcpy(&palette[16], atoms.palette->data, 16 * 2);
-	memcpy(&palette[32], profs_player.palette->data, 16 * 2);
-	memcpy(&palette[48], profs_robot.palette->data, 16 * 2);
+	memcpy(&palette[32], profs.palette->data, 16 * 2);
+	memcpy(&palette[48], robo_pal.palette->data, 16 * 2);
 
 	GridSetup();
 
@@ -680,14 +754,11 @@ void AtomGameStart()
 
 
 
-	m_Current = NULL;
-	m_Next = NULL;
+	m_Current = SPR_addSprite(&profs, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+	SPR_setPosition(m_Current, 2, 52);
 
-	m_CurrentType = -1;
-	m_CurrentId = -1;
-
-	m_NextType = -1;
-	m_NextId = -1;
+	m_Next = SPR_addSprite(&profs, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+	SPR_setPosition(m_Next, 2, 124);
 
 	UpdateUpNext();
 
@@ -767,10 +838,6 @@ void AIInput()
 
 void PlayerInput()
 {
-	m_LastCursorX = m_CursorX;
-	m_LastCursorY = m_CursorY;
-
-
 	UpdatePad(&m_Pad);
 
 	if (m_Pad.Up == PAD_PRESSED)
@@ -897,16 +964,27 @@ void AtomGameUpdate()
 
 		case STATE_ANIMATE:
 		{
-			wait = 3;
+
+			wait = 4;
+			DisableLoopingAnims();
 			AnimateScreen();
 			break;
 		}
 
 		case STATE_ANIMATE_WAIT:
 		{
-			wait--;
+			u8 animating = 0;
+			for (int i = 0; i < 70; i++)
+			{
+				if (m_PlayerGrid[i].Animate >= 0)
+				{
+					animating++;
+				}
+			}
 
-			if (wait < 0)
+			//wait--;
+
+			if (!animating)
 			{
 				m_GameState = STATE_ANIMATE;
 			}
@@ -916,6 +994,10 @@ void AtomGameUpdate()
 
 		case STATE_END_CHECK:
 		{
+			m_CursorPositions[m_CurrentPlayer].X = m_CursorX;
+			m_CursorPositions[m_CurrentPlayer].Y = m_CursorY;
+
+
 			CheckForFinished();
 
 			if (m_GameFinished)
@@ -928,6 +1010,15 @@ void AtomGameUpdate()
 			{
 				SwitchPlayer();
 				UpdateUpNext();
+				EnableLoopingAnims();
+
+
+				if (m_CursorPositions[m_CurrentPlayer].X != -1 && m_CursorPositions[m_CurrentPlayer].Y != -1)
+				{
+					m_CursorX = m_CursorPositions[m_CurrentPlayer].X;
+					m_CursorY = m_CursorPositions[m_CurrentPlayer].Y;
+				}
+
 				m_GameState = STATE_PLAY;
 			}
 		}

@@ -1,6 +1,6 @@
 // IMAGE bgb_image "gfx/bgb.png" BEST
 IMAGE ingame_back "gfx/ingame_Backing.bmp" BEST
-IMAGE atoms "gfx/atoms_24.bmp" NONE
+IMAGE atoms "gfx/atoms_anims2.bmp" NONE
 
 IMAGE title_front "gfx/TitleFront.bmp" BEST
 IMAGE title_back "gfx/TitleBack.bmp" BEST
@@ -27,3 +27,6 @@ IMAGE winner_ai3 "gfx/winner/image9.bmp" BEST
 IMAGE winner_ai4 "gfx/winner/image10.bmp" BEST
 IMAGE winner_ai5 "gfx/winner/image11.bmp" BEST
 IMAGE winner_ai6 "gfx/winner/image11.bmp" BEST
+
+IMAGE tutorial_backing "gfx/tutorial.bmp" BEST
+IMAGE tutorial_backing_2 "gfx/tutorial_backing2.bmp" BEST

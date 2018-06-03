@@ -6,16 +6,48 @@
 #include "../inc/PadHelper.h"
 #include "../inc/AtomsGameState.h"
 #include "../inc/GameState.h"
+#include "../inc/TutorialState.h"
 
 #include "../res/sound.h"
 
-int m_PlayerType[6];
+#include <kdebug.h>
+
+int m_PlayerType[] = {1,2,0,0,0,0};
 
 Sprite* m_Players[6];
 Sprite* m_Cursor;
 
+Sprite* m_Buttons[3];
+
 Pad m_PlayerSelectPad;
 int m_PlayerSelectCurrentlySelected;
+
+
+void UpdateStart()
+{
+	u8 playerCount = 0;
+	for (int i = 0; i < 6; i++)
+	{
+		if (m_PlayerType[i] > 0)
+		{
+			playerCount++;
+		}
+	}
+
+
+	if (playerCount >= 2)
+	{
+		SPR_setVisibility(m_Buttons[2], VISIBLE);
+		VDP_drawText("to", 34, 24);
+		VDP_drawText("start", 34, 25);
+	}
+	else
+	{
+		SPR_setVisibility(m_Buttons[2], HIDDEN);
+		VDP_clearTextArea(34, 24, 6, 2);
+	}
+}
+
 
 void MoveCursor()
 {
@@ -51,79 +83,33 @@ void MoveCursor()
 
 void ChangePlayer(int id, int type)
 {
-	if (m_Players[id] != 0)
-	{
-		SPR_releaseSprite(m_Players[id]);
-	}
-
 	switch (type)
 	{
 		case 0:
 		{
-			m_Players[id] = 0;
+			SPR_setVisibility(m_Players[id], HIDDEN);
 			return;
 		}
 
 		case 1:
 		{
-			m_Players[id] = SPR_addSprite(&profs_player, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+			
+			SPR_setAnim(m_Players[id], id);
+			SPR_setPalette(m_Players[id], PAL2);
+
+			SPR_setVisibility(m_Players[id], VISIBLE);
 			break;
 		}
 
 
 		case 2:
 		{
-			m_Players[id] = SPR_addSprite(&profs_robot, 0, 0, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
+			
+			SPR_setAnim(m_Players[id], id + 6);
+			SPR_setPalette(m_Players[id], PAL3);
 			break;
 		}
 	}
-
-	SPR_setVisibility(m_Players[id], HIDDEN);
-
-	SPR_setAnim(m_Players[id], id);
-
-	switch (id)
-	{
-		case 0:
-		{
-			SPR_setPosition(m_Players[id], 41, 9);
-			break;
-		}
-
-		case 1:
-		{
-			SPR_setPosition(m_Players[id], 130, 9);
-			break;
-		}
-
-
-		case 2:
-		{
-			SPR_setPosition(m_Players[id], 219, 9);
-			break;
-		}
-
-		case 3:
-		{
-			SPR_setPosition(m_Players[id], 41, 98);
-			break;
-		}
-
-		case 4:
-		{
-			SPR_setPosition(m_Players[id], 130, 98);
-			break;
-		}
-
-		case 5:
-		{
-			SPR_setPosition(m_Players[id], 219, 98);
-			break;
-		}
-	}
-
-
-	SPR_setVisibility(m_Players[id], VISIBLE);
 }
 
 
@@ -152,35 +138,104 @@ void PlayerSelectStart()
 	SYS_enableInts();
 
 
+
+	/*
 	m_PlayerType[0] = 1;
 	m_PlayerType[1] = 2;
 	m_PlayerType[2] = 0;
 	m_PlayerType[3] = 0;
 	m_PlayerType[4] = 0;
 	m_PlayerType[5] = 0;
+	*/
 
-
-	for (int i = 0; i < 6; i++)
+	int i = 0;
+	for (i = 0; i < 6; i++)
 	{		
-		m_Players[i] = 0;
+		m_Players[i] = SPR_addSprite(&profs, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+
+		switch (i)
+		{
+			case 0:
+			{
+				SPR_setPosition(m_Players[i], 41, 9);
+				break;
+			}
+
+			case 1:
+			{
+				SPR_setPosition(m_Players[i], 130, 9);
+				break;
+			}
+
+
+			case 2:
+			{
+				SPR_setPosition(m_Players[i], 219, 9);
+				break;
+			}
+
+			case 3:
+			{
+				SPR_setPosition(m_Players[i], 41, 98);
+				break;
+			}
+
+			case 4:
+			{
+				SPR_setPosition(m_Players[i], 130, 98);
+				break;
+			}
+
+			case 5:
+			{
+				SPR_setPosition(m_Players[i], 219, 98);
+				break;
+			}
+		}
+
+
 		ChangePlayer(i, m_PlayerType[i]);
+
+
 	}
 
 	m_Cursor = SPR_addSprite(&playerselect_cursor, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
 	SPR_setPosition(m_Cursor, 41, 4);
 
+	for (i = 0; i < 3; i++)
+	{
+		m_Buttons[i] = SPR_addSprite(&controller, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));		
+	}
+
+
+	SPR_setFrame(m_Buttons[0], 0);
+	SPR_setPosition(m_Buttons[0], 0, 188);
+	
+	SPR_setFrame(m_Buttons[1], 2);
+	SPR_setPosition(m_Buttons[1], 136, 188);
+	
+	SPR_setFrame(m_Buttons[2], 3);
+	SPR_setPosition(m_Buttons[2], 242, 188);
 
 	VDP_setTextPalette(PAL0);
 
 	
+	VDP_drawText("to change",4,24);
+	VDP_drawText("player", 4, 25);
+
+	VDP_drawText("for", 20, 24);
+	VDP_drawText("tutorial", 20, 25);
+
+	UpdateStart();
 
 
 
 	u16 palette[64];
 	memcpy(&palette[0], playerselect_background.palette->data, 16 * 2);
 	memcpy(&palette[16], playerselect_stands_background.palette->data, 16 * 2);
-	memcpy(&palette[32], profs_player.palette->data, 16 * 2);
-	memcpy(&palette[48], profs_robot.palette->data, 16 * 2);
+	
+	memcpy(&palette[32], profs.palette->data, 16 * 2);
+	memcpy(&palette[48], robo_pal.palette->data, 16 * 2);
 
 	m_PlayerSelectCurrentlySelected = 0;
 	SetupPad(&m_PlayerSelectPad, JOY_1);
@@ -199,6 +254,7 @@ void PlayerSelectStart()
 	XGM_setPCM(SND_CHANGE, sound_2, sizeof(sound_2));
 	XGM_setPCM(SND_START, sound_4, sizeof(sound_4));	
 }
+
 
 
 
@@ -273,8 +329,17 @@ void PlayerSelectUpdate()
 		}
 
 		ChangePlayer(m_PlayerSelectCurrentlySelected, m_PlayerType[m_PlayerSelectCurrentlySelected]);
+		UpdateStart();
 
 		XGM_startPlayPCM(SND_CHANGE, 0, 2);
+	}
+
+
+	if (m_PlayerSelectPad.C == PAD_PRESSED)
+	{
+		XGM_startPlayPCM(SND_START, 0, 2);
+
+		StateMachineChange(&GameMachineState, &TutorialState);
 	}
 
 
@@ -291,7 +356,7 @@ void PlayerSelectUpdate()
 			}
 		}
 
-		if (willPlay)
+		if (willPlay >= 2)
 		{
 			m_PlayerSetup[0] = 0;
 			for (int i = 1; i < 7; i++)
@@ -330,6 +395,13 @@ void PlayerSelectEnd()
 	}
 
 	SPR_releaseSprite(m_Cursor);	
+
+	for (int i = 0; i < 3; i++)
+	{
+		SPR_releaseSprite(m_Buttons[i]);
+	}
+
+	VDP_clearTextArea(0, 24, 40, 2);
 
 	SPR_update();
 	VDP_waitVSync();
