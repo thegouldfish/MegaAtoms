@@ -1,12 +1,12 @@
 #include <genesis.h>
 
-#include "gfx.h"
-#include "sprite.h"
-#include "sound.h"
+#include "../inc/PadHelper.h"
+#include "../inc/atoms.h"
 
 #include "../inc/Title.h"
 #include "../inc/GameState.h"
 #include "../inc/AtomsGameState.h"
+
 
 StateMachine GameMachineState;
 
@@ -28,12 +28,16 @@ int main()
 	StateMachineStart(&GameMachineState, &TitleState);
 	//StateMachineStart(&GameMachineState, &AtomsGameState);
     
+	SetupPad(&m_Pad, JOY_1);
+
 	while(TRUE)
     {
-        SPR_update();
+        
 		
+		UpdatePad(&m_Pad);
 		StateMachineUpdate(&GameMachineState);
 
+		SPR_update();
         VDP_waitVSync();
     }
 

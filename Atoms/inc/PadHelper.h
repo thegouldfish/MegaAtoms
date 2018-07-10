@@ -36,6 +36,6 @@ typedef struct
 
 void SetupPad(Pad* pad, u16 player);
 void UpdatePad(Pad* pad);
-
+void ResetPad(Pad* pad);
 
 #endif

@@ -61,6 +61,11 @@ function BuildCode()
     $pinfo.RedirectStandardError = $true    
     $pinfo.UseShellExecute = $false
     $pinfo.Arguments = "-f $($env:GDK_WIN)\makefile.gen"
+
+	if($Flavour -eq "Debug")
+	{
+		$pinfo.Arguments += " debug"
+	}
     $pinfo.WorkingDirectory = $SourceLocation
 
     $pinfo.EnvironmentVariables["path"] = $env:Path
@@ -69,6 +74,7 @@ function BuildCode()
 
     $p = New-Object System.Diagnostics.Process
     
+	Write-Host $pinfo.Arguments
 
     $p.StartInfo = $pinfo
     $p.Start() | Out-Null

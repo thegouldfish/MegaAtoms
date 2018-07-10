@@ -4,14 +4,22 @@
 #include "../inc/Title.h"
 #include "../inc/AtomsGameState.h"
 #include "../inc/PlayerSelectState.h"
+#include "../inc/GameSelectState.h"
 
 #include "../inc/GameState.h"
 
 #include "../res/gfx.h"
 #include "../res/sound.h"
+#include "../res/sprite.h"
 
+#include <kdebug.h>
 
-int timer = 160;
+static int timer = 160;
+static int scroll = 0;
+
+static int animTimer = 0;
+static int frame = 0;
+static u16 animPal[16];
 
 void TitleStart()
 {
@@ -25,12 +33,35 @@ void TitleStart()
 
 	XGM_setPCM(65, gouldfish_chime, sizeof(gouldfish_chime));
 	XGM_startPlayPCM(65, 0, SOUND_PCM_CH2);
+
+	
 }
 
 
 
-int scroll = 0;
-int slow = 2;
+
+
+
+
+
+void AnimatePalette(int shadow, int bright)
+{
+	// reset everything to the hidden colours
+	for (int i = 1; i < 11; i += 2)
+	{
+		animPal[i] = title_anim.palette->data[12];
+		animPal[i + 1] = title_anim.palette->data[13];
+	}
+
+	// shdaow is the after image part
+	animPal[shadow] = title_anim.palette->data[14];
+	animPal[shadow + 1] = title_anim.palette->data[15];
+	
+	// this is the main bright bit 
+	animPal[bright] = title_anim.palette->data[1];
+	animPal[bright + 1] = title_anim.palette->data[2];
+}
+
 void TitleUpdate()
 {
 	if (timer > 0)
@@ -49,8 +80,8 @@ void TitleUpdate()
 		VDP_setHilightShadow(FALSE);
 		int ind = TILE_USERINDEX;
 		
-		VDP_drawImageEx(PLAN_B, &title_back, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
-		ind += title_back.tileset->numTile;
+		VDP_drawImageEx(PLAN_B, &title_anim, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+		ind += title_anim.tileset->numTile;
 
 		VDP_drawImageEx(PLAN_A, &title_front, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
 
@@ -63,7 +94,11 @@ void TitleUpdate()
 		
 		u16 palette[64];
 		memset(palette, 0, 64);
-		memcpy(&palette[0], title_back.palette->data, 16 * 2);
+
+		memcpy(&animPal, title_anim.palette->data, 16 * 2);
+		AnimatePalette(9, 1);
+
+		memcpy(&palette[0], animPal, 16 * 2);	
 		memcpy(&palette[16], title_front.palette->data, 16 * 2);
 
 		// fade in
@@ -73,37 +108,44 @@ void TitleUpdate()
 
 
 		timer = -1;
+		animTimer = 10;
 	}
 	else
 	{
 		
-		slow--;
-		if (timer < -60)
+		if (animTimer >= 10)
 		{
-			slow = 2;
-			timer = -1;
-			scroll = 0;
-		}
-		else if (timer < -30)
-		{
-			if (slow == 0)
+			frame++;
+			if (frame == 5)
 			{
-				timer--;
-				scroll++;
-				slow = 2;
+				frame = 0;
 			}
-		}
-		else
-		{
-			if (slow == 0)
+			if (frame == 0)
 			{
-				timer--;
-				scroll--;
-				slow = 2;
+				AnimatePalette(9, 1);
 			}
+			else if (frame == 1)
+			{
+				AnimatePalette(1, 3);
+			}
+			else if (frame == 2)
+			{
+				AnimatePalette(3, 5);
+			}
+			else if (frame ==3)
+			{
+				AnimatePalette(5, 7);
+			}
+			else if (frame == 4)
+			{
+				AnimatePalette(7, 9);
+			}
+			animTimer = 0;
 		}
+
+		animTimer++;
 		
-		
+		VDP_setPalette(PAL0, animPal);
 		
 
 		VDP_setHorizontalScroll(PLAN_B, scroll);
@@ -114,7 +156,8 @@ void TitleUpdate()
 		if (value & BUTTON_A || value & BUTTON_START)
 		{
 			//StateMachineChange(&GameMachineState, &AtomsGameState);
-			StateMachineChange(&GameMachineState, &PlayerSelectState);
+			//StateMachineChange(&GameMachineState, &PlayerSelectState);
+			StateMachineChange(&GameMachineState, &GameSelectState);
 		}
 	}
 }
@@ -126,7 +169,7 @@ void TitleEnd()
 	//VDP_clearText(8, 24, 24);
 
 
-	VDP_fadeOut(16, 31, 10, FALSE);
+	VDP_fadeOut(0, 31, 10, FALSE);
 
 
 	//VDP_fadeOut(16, 31, 20, FALSE);

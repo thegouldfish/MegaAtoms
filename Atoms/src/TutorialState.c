@@ -1,14 +1,15 @@
 #include <genesis.h>
 
+#include "../inc/atoms.h"
 #include "../inc/TutorialState.h"
 #include "../res/gfx.h"
 #include "../inc/GameState.h"
 #include "../inc/PlayerSelectState.h"
 #include "../inc/PadHelper.h"
+#include "../inc/GamePlay.h"
 
 int m_PreviousState = 0;
-Pad m_TutorialPad;
-int m_AtomTileStart = 0;
+
 
 StateMachine m_TutorialMachine;
 
@@ -116,7 +117,7 @@ void Part1Start()
 
 void Part1Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		m_PreviousState = 1;
 		StateMachineChange(&m_TutorialMachine, &Part2);
@@ -180,12 +181,12 @@ void Part2Start()
 
 void Part2Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		m_PreviousState = 2;
 		StateMachineChange(&m_TutorialMachine, &Part3);
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part1);
 	}
@@ -215,11 +216,11 @@ void Part3Start()
 
 void Part3Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part4);
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part2);
 	}
@@ -251,7 +252,7 @@ void Part4Start()
 }	
 void Part4Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		m_Part4Counter++;
 		if (m_Part4Counter == 4)
@@ -263,7 +264,7 @@ void Part4Update()
 			TutorialDrawAtom(0, 4, 3, m_Part4Counter);
 		}		
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part3);
 	}
@@ -293,11 +294,11 @@ void Part5Start()
 }	
 void Part5Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part6);
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part4);
 	}
@@ -328,11 +329,11 @@ void Part6Start()
 
 void Part6Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part7);
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part5);
 	}
@@ -406,11 +407,11 @@ void Part7Start()
 
 void Part7Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part8);
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part6);
 	}
@@ -435,11 +436,11 @@ void Part8Start()
 }	
 void Part8Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part9);
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part7);
 	}
@@ -465,11 +466,11 @@ void Part9Start()
 }	
 void Part9Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part10);
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part8);
 	}
@@ -494,11 +495,11 @@ void Part10Start()
 }
 void Part10Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part11);
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part9);
 	}
@@ -523,11 +524,11 @@ void Part11Start()
 }
 void Part11Update()
 {
-	if (m_TutorialPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part1);
 	}
-	else if (m_TutorialPad.B == PAD_PRESSED)
+	else if (m_Pad.B == PAD_PRESSED)
 	{
 		StateMachineChange(&m_TutorialMachine, &Part10);
 	}
@@ -555,17 +556,16 @@ SimpleState Part11 =
 
 void TutorialStateStart()
 {
-	SetupPad(&m_TutorialPad, JOY_1);
 	StateMachineStart(&m_TutorialMachine, &Part1);
 }
 
 
 void TutorialStateUpdate()
 {
-	UpdatePad(&m_TutorialPad);
+	UpdatePad(&m_Pad);
 
 
-	if (m_TutorialPad.C == PAD_PRESSED)
+	if (m_Pad.C == PAD_PRESSED)
 	{
 		StateMachineChange(&GameMachineState, &PlayerSelectState);
 		return;

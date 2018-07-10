@@ -6,5 +6,10 @@ extern const SpriteDefinition playerselect_cursor;
 extern const SpriteDefinition profs;
 extern const SpriteDefinition robo_pal;
 extern const SpriteDefinition controller;
+extern const SpriteDefinition Numbers;
+extern const SpriteDefinition NumbersBig;
+extern const SpriteDefinition AtomsSample;
+extern const SpriteDefinition Scalers;
+extern const SpriteDefinition messages;
 
 #endif // _RES_SPRITE_H_

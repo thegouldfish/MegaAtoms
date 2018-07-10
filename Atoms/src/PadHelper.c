@@ -24,6 +24,13 @@ void SetupPad(Pad* pad, u16 id)
 	UpdatePad(pad);
 }
 
+void ResetPad(Pad* pad)
+{
+	pad->PrevState = 0;
+	pad->CurrentState = 0;
+
+	UpdatePad(pad);
+}
 
 void UpdatePad(Pad* pad)
 {

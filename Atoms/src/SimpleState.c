@@ -1,25 +1,29 @@
 #include "..\inc\SimpleState.h"
 
 
+static int Switching = 0;
 
 void StateMachineStart(StateMachine* machine, SimpleState* state)
 {
 	if (state != 0 && machine != 0)
 	{
+		Switching = 1;
 		machine->ChangeTo = 0;
 		machine->TransisionOutFrames = -1;
 		machine->TransisionInFrames = -1;
 
 		machine->CurrentState = state;
 		machine->CurrentState->Start();
+		Switching = 0;
 	}
 }
 
 
 void StateMachineChange(StateMachine* machine, SimpleState* state)
 {
-	if (state != 0 && machine != 0)
+	if (state != 0 && machine != 0 && Switching == 0)
 	{
+		Switching = 1;
 		machine->ChangeTo = 0;
 
 		machine->CurrentState->End();
@@ -27,13 +31,14 @@ void StateMachineChange(StateMachine* machine, SimpleState* state)
 		machine->CurrentState = state;
 		
 		machine->CurrentState->Start();
+		Switching = 0;
 	}
 }
 
 
 void StateMachineUpdate(StateMachine* machine)
 {
-	if (machine != 0)
+	if (machine != 0 && Switching == 0)
 	{
 		machine->CurrentState->Update();
 

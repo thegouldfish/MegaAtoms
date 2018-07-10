@@ -1,6 +1,7 @@
 #include <genesis.h>
 #include <kdebug.h>
 
+#include "../inc/atoms.h"
 #include "../inc/AtomsGameState.h"
 #include "../res/gfx.h"
 #include "../res/sprite.h"
@@ -9,37 +10,33 @@
 #include "../inc/GameState.h"
 #include "../inc/PadHelper.h"
 
+#include "../inc/GamePlay.h"
 
-int m_AtomTileStart;
-
-int m_CursorX = 0;
-int m_CursorY = 0;
-
-int m_TurnCount = 0;
-
-int m_CurrentPlayer = 0;
-
-int m_WinningPlayer;
-
-Sprite* m_Cursor;
-
-Sprite *m_Current;
-Sprite *m_Next;
-
-Pad m_Pad;
 
 #define STATE_PLAY 0
 #define STATE_ANIMATE 1
 #define STATE_ANIMATE_WAIT 2
 #define STATE_END_CHECK 3
 
-int m_GameState = STATE_PLAY;
 
-int m_GameFinished;
-int m_Alive[7];
-int m_PlayerSetup[7];
+static int m_TurnCount = 0;
+
+static int m_CurrentPlayer = 0;
+
+static Sprite *m_Current;
+static Sprite *m_Next;
 
 
+
+static int m_GameState = STATE_PLAY;
+
+static int m_GameFinished;
+static int m_Alive[7];
+
+
+
+static int wait = 0;
+static Point m_CursorPositions[7];
 
 
 #define SND_MOVE 67
@@ -48,184 +45,8 @@ int m_PlayerSetup[7];
 
 
 
-typedef struct 
-{
-	int Start;
-	int Count;
-	int FrameRate;
-	int Loop;
-}anim;
-
-anim m_Animations[] = 
-{
-	{1,4,2,0}, // Grow to 1
-	{4,4,2,0 }, // Grow to 2
-	{8,4,2,0 }, // Grow to 3
-	
-	{13,5,2,1}, // Idle 1
-	{19,5,2,1}, // Idle 2
-
-	{25,4,3,1}, // Crit 1
-	{29,4,3,1}, // Crit 2	
-	{33,4,3,1}, // Crit 3
-
-	{37,4,2,0} // Explode
-};
-
-
-
-typedef struct
-{
-	int X;
-	int Y;
-}Point;
-
-
-
-
-
-struct GridSquare
-{
-	int Player;
-	int Size;
-	int GrowSize;
-	int Changed;
-	int MaxSize;
-	int Explode;
-
-	int Animate;
-	int Frame;
-	int FrameCounter;
-} m_PlayerGrid[70];
-
-
-
-
-
-
-
-Point m_CursorPositions[7];
-
-
-void GridSetup()
-{
-	int i = 0;
-	int y = 0;
-	int x = 0;
-	for (y = 0; y<7; y++)
-	{
-		for (x = 0; x<10; x++)
-		{
-			m_PlayerGrid[i].Player = 0;
-
-			if (y == 0 && x == 0)
-			{
-				m_PlayerGrid[i].MaxSize = 2;
-			}
-			else if (y == 0 && x == 9)
-			{
-				m_PlayerGrid[i].MaxSize = 2;
-			}
-			else if (y == 0)
-			{
-				m_PlayerGrid[i].MaxSize = 3;
-			}
-			else if (y == 6 && x == 0)
-			{
-				m_PlayerGrid[i].MaxSize = 2;
-			}
-			else if (x == 0)
-			{
-				m_PlayerGrid[i].MaxSize = 3;
-			}
-			else if (y == 6 && x == 9)
-			{
-				m_PlayerGrid[i].MaxSize = 2;
-			}
-			else if (y == 6)
-			{
-				m_PlayerGrid[i].MaxSize = 3;
-			}
-			else if (x == 9)
-			{
-				m_PlayerGrid[i].MaxSize = 3;
-			}
-			else
-			{
-				m_PlayerGrid[i].MaxSize = 4;
-			}
-
-			i++;
-		}
-	}
-}
-
-
-void DrawAtom(int player, int x, int y, int size)
-{
-	if (player < 0)
-	{
-		player = 0;
-		size = 0;
-	}
-
-	int startingFrame = 0;
-	int animate = m_PlayerGrid[(y * 10) + x].Animate;
-	if (animate >= 0)
-	{
-		anim* details = &m_Animations[animate];
-		m_PlayerGrid[(y * 10) + x].FrameCounter++;
-
-		if (m_PlayerGrid[(y * 10) + x].FrameCounter > details->FrameRate)
-		{
-			m_PlayerGrid[(y * 10) + x].Frame++;
-			m_PlayerGrid[(y * 10) + x].FrameCounter = 0;
-		}			
-
-		if (m_PlayerGrid[(y * 10) + x].Frame >= details->Count)
-		{
-			if (details->Loop)
-			{
-				m_PlayerGrid[(y * 10) + x].Frame = 0;
-			}
-			else
-			{
-				m_PlayerGrid[(y * 10) + x].Animate = -1;
-				m_PlayerGrid[(y * 10) + x].Frame = details->Count -1;
-			}
-		}
-		startingFrame = (details->Start + m_PlayerGrid[(y * 10) + x].Frame);
-	}
-	else
-	{
-		if (size == 4)
-		{
-			startingFrame = 39;
-		}
-		else
-		{
-			startingFrame = size * 4;
-		}
-	}
-	
-	u16 t = (startingFrame * 3 * 6 * 3) + (player * 3);
-	for (int row = 0; row < 3; row++)
-	{
-		for (int column = 0; column < 3; column++)
-		{
-			u16 tile = m_AtomTileStart;
-			if (size != 0)
-			{
-				tile += atoms.map->tilemap[t];
-			}
-			VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, tile), column + (x * 3), row + (y * 3));
-			t++;
-		}
-		t += 15;
-	}
-}
-
-
+int m_WinningPlayer = 0;
+int m_PlayerSetup[7];
 
 void SetupGame()
 {
@@ -292,96 +113,11 @@ void SwitchPlayer()
 }
 
 
-void HideCursor()
-{
-	SPR_setPosition(m_Cursor, -32, -32);
-}
-
-void UpdateCursor()
-{
-	SPR_setPosition(m_Cursor, (m_CursorX * 24) + 56, (m_CursorY * 24) + 24);
-}
-
-
-void DrawFullGrid()
-{
-	int x = 0;
-	int y = 0;
-
-	for (y = 0; y < 7; y++)
-	{
-		for (x = 0; x < 10; x++)
-		{
-			int maxSize = m_PlayerGrid[(y * 10) + x].MaxSize;
-
-			if (maxSize == 4)
-				maxSize = 5;
-
-			int rnd = (((y + x)* y) + 5 / (x+1)) % (6);
-			DrawAtom(rnd, x, y, maxSize);
-		}
-	}
-}
-
-
-void DrawGameGrid()
-{
-	int x = 0;
-	int y = 0;
-
-	for (y = 0; y < 7; y++)
-	{
-		for (x = 0; x < 10; x++)
-		{
-			int size = m_PlayerGrid[(y * 10) + x].Size;
-			if (size == 5)
-			{
-				size = 4;
-			}
-
-			DrawAtom(m_PlayerGrid[(y * 10) + x].Player - 1, x, y, size);
-		}
-	}
-
-}
-
-
-void IncrementSquare(int x, int y, int player)
-{
-	int square = (y * 10) + x;
-
-	m_PlayerGrid[square].GrowSize++;
-	m_PlayerGrid[square].Changed = 1;
-	m_PlayerGrid[square].Player = player;
-}
-
-
-int TryIncrementSquare(int x, int y, int player)
-{
-	int square = (y * 10) + x;
-
-	if (m_PlayerGrid[square].Player == player || m_PlayerGrid[square].Player == 0)
-	{
-		IncrementSquare(x, y, player);
-		return 1;
-	}
-
-	return 0;
-}
-
-int PlayerAtSquare(int x, int y)
-{
-	return m_PlayerGrid[(y * 10) + x].Player;
-}
-
-int SizeAtSquare(int x, int y)
-{
-	return m_PlayerGrid[(y * 10) + x].Size;
-}
 
 
 
-void EnableLoopingAnims()
+
+static void EnableLoopingAnims()
 {
 	int y = 0;
 	int x = 0;
@@ -408,7 +144,7 @@ void EnableLoopingAnims()
 	}
 }
 
-void DisableLoopingAnims()
+static void DisableLoopingAnims()
 {
 	int y = 0;
 	int x = 0;
@@ -424,7 +160,7 @@ void DisableLoopingAnims()
 }
 
 
-void AnimateScreen()
+static void AnimateScreen()
 {
 	u8 animating = 1;
 	int x = 0;
@@ -743,7 +479,6 @@ void AtomGameStart()
 	//DrawFullGrid();
 
 	SetupGame();
-	SetupPad(&m_Pad, JOY_1);
 
 	m_WinningPlayer = 0;
 
@@ -836,10 +571,8 @@ void AIInput()
 }
 
 
-void PlayerInput()
+static void PlayerInput()
 {
-	UpdatePad(&m_Pad);
-
 	if (m_Pad.Up == PAD_PRESSED)
 	{
 		m_CursorY--;
@@ -942,7 +675,7 @@ void CheckForFinished()
 
 
 
-int wait = 0;
+
 
 void AtomGameUpdate()
 {

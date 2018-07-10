@@ -1,5 +1,6 @@
 #include <genesis.h>
 
+#include "../inc/atoms.h"
 #include "../inc/PlayerSelectState.h"
 #include "../res/gfx.h"
 #include "../res/sprite.h"
@@ -7,6 +8,7 @@
 #include "../inc/AtomsGameState.h"
 #include "../inc/GameState.h"
 #include "../inc/TutorialState.h"
+#include "../inc/GameSelectState.h"
 
 #include "../res/sound.h"
 
@@ -19,7 +21,6 @@ Sprite* m_Cursor;
 
 Sprite* m_Buttons[3];
 
-Pad m_PlayerSelectPad;
 int m_PlayerSelectCurrentlySelected;
 
 
@@ -238,7 +239,6 @@ void PlayerSelectStart()
 	memcpy(&palette[48], robo_pal.palette->data, 16 * 2);
 
 	m_PlayerSelectCurrentlySelected = 0;
-	SetupPad(&m_PlayerSelectPad, JOY_1);
 
 	MoveCursor();
 
@@ -261,10 +261,7 @@ void PlayerSelectStart()
 
 void PlayerSelectUpdate()
 {
-	UpdatePad(&m_PlayerSelectPad);
-
-
-	if (m_PlayerSelectPad.Left == PAD_PRESSED)
+	if (m_Pad.Left == PAD_PRESSED)
 	{
 		m_PlayerSelectCurrentlySelected--;
 
@@ -278,7 +275,7 @@ void PlayerSelectUpdate()
 	}
 
 
-	if (m_PlayerSelectPad.Right == PAD_PRESSED)
+	if (m_Pad.Right == PAD_PRESSED)
 	{
 		m_PlayerSelectCurrentlySelected++;
 
@@ -291,7 +288,7 @@ void PlayerSelectUpdate()
 		XGM_startPlayPCM(SND_MOVE, 0, 2);
 	}
 
-	if (m_PlayerSelectPad.Down == PAD_PRESSED)
+	if (m_Pad.Down == PAD_PRESSED)
 	{
 		m_PlayerSelectCurrentlySelected += 3;
 
@@ -305,7 +302,7 @@ void PlayerSelectUpdate()
 	}
 
 
-	if (m_PlayerSelectPad.Up == PAD_PRESSED)
+	if (m_Pad.Up == PAD_PRESSED)
 	{
 		m_PlayerSelectCurrentlySelected -= 3;
 
@@ -319,7 +316,7 @@ void PlayerSelectUpdate()
 	}
 
 
-	if (m_PlayerSelectPad.A == PAD_PRESSED)
+	if (m_Pad.A == PAD_PRESSED)
 	{
 		m_PlayerType[m_PlayerSelectCurrentlySelected] ++;
 
@@ -334,8 +331,14 @@ void PlayerSelectUpdate()
 		XGM_startPlayPCM(SND_CHANGE, 0, 2);
 	}
 
+	if (m_Pad.B == PAD_PRESSED)
+	{
+		XGM_startPlayPCM(SND_START, 0, 2);
 
-	if (m_PlayerSelectPad.C == PAD_PRESSED)
+		StateMachineChange(&GameMachineState, &GameSelectState);
+	}
+
+	if (m_Pad.C == PAD_PRESSED)
 	{
 		XGM_startPlayPCM(SND_START, 0, 2);
 
@@ -343,7 +346,7 @@ void PlayerSelectUpdate()
 	}
 
 
-	if (m_PlayerSelectPad.START == PAD_PRESSED)
+	if (m_Pad.START == PAD_PRESSED)
 	{
 
 		u8 willPlay = 0;

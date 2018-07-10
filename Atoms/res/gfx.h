@@ -1,13 +1,13 @@
 #ifndef _RES_GFX_H_
 #define _RES_GFX_H_
 
-extern const Image ingame_back;
-extern const Image atoms;
 extern const Image title_front;
-extern const Image title_back;
+extern const Image title_anim;
 extern const Image gouldfish;
+extern const Image atoms;
 extern const Image playerselect_background;
 extern const Image playerselect_stands_background;
+extern const Image ingame_back;
 extern const Image winner_background;
 extern const Image winner_player1;
 extern const Image winner_player2;
@@ -23,5 +23,9 @@ extern const Image winner_ai5;
 extern const Image winner_ai6;
 extern const Image tutorial_backing;
 extern const Image tutorial_backing_2;
+extern const Image GameSelect;
+extern const Image prototype1_backing;
+extern const Image Prototype2_Background;
+extern const Image GameOver_background;
 
 #endif // _RES_GFX_H_
