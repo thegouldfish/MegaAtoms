@@ -38,3 +38,6 @@ This uses the same basic mechanics of classic mode but now you need to pop a set
 you gain points and more time from popping the atoms and the goal is to get the best score possible.
 The score multipler increases for each chain reaction you start but is capped at the current level so moving up the levels
 are required to get a better score.
+
+
+V0.3
