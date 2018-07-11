@@ -10,6 +10,11 @@ This is using [SGDK](https://github.com/Stephane-D/SGDK)
 
 # About
 
+Mega Atoms contains two game modes, Classic and Challenge
+
+
+
+# Classic
 Atoms is 6 player multi-player game in which you have to create take control of the playing board.
 you can play it in hot seat mode against 5 other people, or against (quite stupid) AI players.
 
@@ -26,3 +31,10 @@ Place your atoms on any empty square or stack them on top of your own, but when 
 
 Currently the game is playable only using the first controller.
 Press start once you've setup the game then press A to place Atoms.
+
+
+#Challenge
+This uses the same basic mechanics of classic mode but now you need to pop a set number of atoms to make it to the next level.
+you gain points and more time from popping the atoms and the goal is to get the best score possible.
+The score multipler increases for each chain reaction you start but is capped at the current level so moving up the levels
+are required to get a better score.
