@@ -21,23 +21,31 @@ you can play it in hot seat mode against 5 other people, or against (quite stupi
 ![](https://www.dropbox.com/s/qgvbkfr6gyndkpt/playerselect.png?raw=1)
 
  
-# How To Play
+## How To Play
 
 Place your atoms on any empty square or stack them on top of your own, but when the numbers get too high they will go critical! When it explodes it will send atoms flying and end up stacking on the atoms around it, which not long increases the size of the stack but also put the stack under your control.  This is the key to taking over the gaming board.
 
 ![](https://www.dropbox.com/s/07yj78wr85o0bo9/ingame.png?raw=1)
 
-# Input
+## Input
 
 Currently the game is playable only using the first controller.
 Press start once you've setup the game then press A to place Atoms.
 
 
-#Challenge
+
+# Challenge
 This uses the same basic mechanics of classic mode but now you need to pop a set number of atoms to make it to the next level.
 you gain points and more time from popping the atoms and the goal is to get the best score possible.
 The score multipler increases for each chain reaction you start but is capped at the current level so moving up the levels
 are required to get a better score.
 
+## How to play
+Basic game play is the same as classic, but you have to place the Atom provided.
+If you clear the screen (set it to the same colour) or don't have a space to put your current atom you will get
+a time penalty.
 
-V0.3
+
+
+
+# V0.3
