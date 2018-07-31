@@ -21,3 +21,8 @@ $RECYCLE.BIN/
 # =========================
 # Operating System Files
 # =========================
+*.db
+*.o
+*.suo
+Atoms/out/
+*.opendb

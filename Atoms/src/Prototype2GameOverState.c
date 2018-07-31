@@ -56,10 +56,6 @@ void Prototype2GameOverStateStart()
 
 	memcpy(&palette[0], GameOver_background.palette->data, 16 * 2);
 	memcpy(&palette[16], NumbersBig.palette->data, 16 * 2);
-
-
-	m_Score = 46;
-	m_CurrentLevel = 1;
 		
 	SetNumbers(m_Score, m_ScoreSpr, 10);
 	SetNumbers(m_CurrentLevel+1, m_LevelSpr, 2);
@@ -102,6 +98,9 @@ void Prototype2GameOverStateEnd()
 		}
 		SPR_releaseSprite(m_ScoreSpr[i]);
 	}
+	
+	SPR_reset();
+	SPR_update();
 
 }
 

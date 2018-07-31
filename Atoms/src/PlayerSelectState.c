@@ -138,17 +138,6 @@ void PlayerSelectStart()
 	VDP_drawImageEx(PLAN_A, &playerselect_stands_background, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
 	SYS_enableInts();
 
-
-
-	/*
-	m_PlayerType[0] = 1;
-	m_PlayerType[1] = 2;
-	m_PlayerType[2] = 0;
-	m_PlayerType[3] = 0;
-	m_PlayerType[4] = 0;
-	m_PlayerType[5] = 0;
-	*/
-
 	int i = 0;
 	for (i = 0; i < 6; i++)
 	{		

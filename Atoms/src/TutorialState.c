@@ -1,4 +1,5 @@
 #include <genesis.h>
+#include <kdebug.h>
 
 #include "../inc/atoms.h"
 #include "../inc/TutorialState.h"
@@ -557,14 +558,12 @@ SimpleState Part11 =
 void TutorialStateStart()
 {
 	StateMachineStart(&m_TutorialMachine, &Part1);
+	ResetPad(&m_Pad);
 }
 
 
 void TutorialStateUpdate()
 {
-	UpdatePad(&m_Pad);
-
-
 	if (m_Pad.C == PAD_PRESSED)
 	{
 		StateMachineChange(&GameMachineState, &PlayerSelectState);
@@ -577,7 +576,7 @@ void TutorialStateUpdate()
 
 void TutorialStateEnd()
 {
-	VDP_fadeOut(0, 64, 20, FALSE);
+	VDP_fadeOut(0, 63, 20, FALSE);
 }
 
 

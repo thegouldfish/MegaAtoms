@@ -880,6 +880,7 @@ void Protype2ScreenStart()
 	SetupRandom(0);
 
 	m_LevelingAmount = m_InitalLevelingAmount;
+	m_LevelNeeded = 2;
 	SetupLevel();
 
 	m_CursorX = 0;
@@ -887,20 +888,22 @@ void Protype2ScreenStart()
 	UpdateCursor();
 
 	
-
+	
 	m_NextAtom = random_int(1, 6);
 	m_NextAtom = m_RandomBag[0];
 	m_CurrentRnd = 1;
-
+	m_Multiplier = 1;
 
 	m_TimePerExplosion = m_InitalTimePerExplosion;
 	m_MaxTime = m_InitalMaxTime;
 	m_Time = m_MaxTime;
 	
+	m_GameState = PROTO2_STATE_PLAY;
 
 	NextAtom();
 
 	UpdateTime();
+	VDP_setPaletteColors(0, (u16*)palette_black, 64);
 
 	DrawGameGrid();
 	UpdateNumbers();
@@ -966,7 +969,7 @@ static int CheckForSpace()
 
 #define WAITFOR 100
 static int m_levelWait = WAITFOR;
-int frame = 0;
+
 void Protype2ScreenUpdate()
 {
 	fix32 current = getTimeAsFix32(getTick());
@@ -1144,7 +1147,6 @@ void Protype2ScreenUpdate()
 		}
 
 		default:
-
 			break;
 	}
 
@@ -1177,7 +1179,7 @@ void Protype2ScreenUpdate()
 
 void Protype2ScreenEnd()
 {
-	VDP_fadeOut(0, 31, 10, FALSE);	
+	VDP_fadeOut(0, 63, 10, FALSE);	
 	XGM_setMusicTempo(60);
 	SPR_releaseSprite(m_NextAtomsSpr);
 	SPR_releaseSprite(m_Cursor);
@@ -1201,6 +1203,7 @@ void Protype2ScreenEnd()
 		SPR_releaseSprite(m_NumbersSpr[i]);
 	}
 
+	SPR_update();
 	VDP_resetScreen();
 }
 
