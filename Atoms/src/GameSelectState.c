@@ -4,13 +4,14 @@
 #include "../inc/PlayerSelectState.h"
 #include "../res/gfx.h"
 #include "../res/sound.h"
+#include "../res/sprite.h"
 
 #include "../inc/simpleState.h"
 #include "../inc/PlayerSelectState.h"
 
-#include "../inc/Prototype1.h"
 #include "../inc/Prototype2.h"
 #include "../inc/Prototype2GameOverState.h"
+#include "../inc/ChallengeModeHighScoreState.h"
 
 #include "../inc/GameState.h"
 #include "../inc/PadHelper.h"
@@ -22,15 +23,13 @@ void GameSelectStateStart()
 {
 	SYS_disableInts();
 
-	VDP_setHilightShadow(FALSE);
 	int ind = TILE_USERINDEX;
-
-	VDP_drawImageEx(PLAN_A, &GameSelect, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
-	ind += GameSelect.tileset->numTile;
+	
+	VDP_drawImageEx(PLAN_A, &GameSelect, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA);
+	ind += GameSelect.tileset->numTile;	
 
 	SYS_enableInts();
-
-
+	
 
 	u16 palette[64];
 	memset(palette, 0, 64);
@@ -40,7 +39,7 @@ void GameSelectStateStart()
 	XGM_setPCM(SND_START, sound_4, sizeof(sound_4));
 
 	// fade in
-	VDP_fadeIn(0, 15, palette, 20, FALSE);
+	VDP_fadeIn(0, 15, palette, 20, FALSE);		
 
 	ResetPad(&m_Pad);
 }
@@ -57,15 +56,8 @@ void GameSelectStateUpdate()
 	else if (m_Pad.C == PAD_RELEASED)
 	{
 		XGM_startPlayPCM(SND_START, 0, 2);
-		StateMachineChange(&GameMachineState, &Protype2ScreenState);
+		StateMachineChange(&GameMachineState, &ChallengeModeHighScoreState);
 	}
-	/*
-	else if (m_Pad.B == PAD_RELEASED)
-	{
-		XGM_startPlayPCM(SND_START, 0, 2);
-		StateMachineChange(&GameMachineState, &Prototype2GameOverState);
-	}
-	*/
 }
 
 void GameSelectStateEnd()

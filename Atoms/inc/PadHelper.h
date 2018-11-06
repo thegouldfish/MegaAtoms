@@ -24,13 +24,11 @@ typedef struct
 	u8 Left;
 	u8 Right;
 
-
+	u8 X;
+	u8 Y;
 
 	u16 CurrentState;
 	u16 PrevState;
-		
-
-
 }Pad;
 
 

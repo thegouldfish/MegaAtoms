@@ -1,3 +1,4 @@
+#include <genesis.h>
 #include "..\inc\SimpleState.h"
 
 
@@ -27,6 +28,9 @@ void StateMachineChange(StateMachine* machine, SimpleState* state)
 		machine->ChangeTo = 0;
 
 		machine->CurrentState->End();
+
+		SPR_update();
+		VDP_waitVSync();
 
 		machine->CurrentState = state;
 		

@@ -23,5 +23,4 @@ extern SimpleState AtomsGameState;
 extern int m_PlayerSetup[7];
 extern int m_WinningPlayer;
 
-
 #endif

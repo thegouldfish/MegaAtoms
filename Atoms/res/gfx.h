@@ -3,7 +3,8 @@
 
 extern const Image title_front;
 extern const Image title_anim;
-extern const Image gouldfish;
+extern const Image logo_bg_1;
+extern const Image logo_bg_2;
 extern const Image atoms;
 extern const Image playerselect_background;
 extern const Image playerselect_stands_background;
@@ -24,8 +25,10 @@ extern const Image winner_ai6;
 extern const Image tutorial_backing;
 extern const Image tutorial_backing_2;
 extern const Image GameSelect;
-extern const Image prototype1_backing;
 extern const Image Prototype2_Background;
-extern const Image GameOver_background;
+extern const Image GameOver_Background;
+extern const Image HighScoreTable_Background;
+extern const Image NewHighScore_Background;
+extern const Image med_font;
 
 #endif // _RES_GFX_H_

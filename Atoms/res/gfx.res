@@ -3,7 +3,10 @@
 // Title screen
 IMAGE title_front "gfx/TitleFront.bmp" BEST
 IMAGE title_anim "gfx/title_anim_more.bmp" BEST
-IMAGE gouldfish "gfx/gouldfish.bmp" BEST
+
+
+IMAGE logo_bg_1 "gfx/logo_bg_1.bmp" BEST
+IMAGE logo_bg_2 "gfx/logo_bg_2.bmp" BEST
 
 
 // General
@@ -51,14 +54,18 @@ IMAGE GameSelect "gfx/GameSelect2.bmp" BEST
 
 
 
-// Prototype 1
-// ---------------------------
-
-IMAGE prototype1_backing "gfx/Prototype1Background.bmp" BEST
-
-
-
 // Prototype 2
 // ---------------------------
 IMAGE Prototype2_Background "gfx/Prototype2Background.bmp" NONE
-IMAGE GameOver_background "gfx/GameOver.bmp" NONE
+
+
+// Challegne Mode Screens
+// ---------------------------
+IMAGE GameOver_Background "gfx/GameOver.bmp" BEST
+IMAGE HighScoreTable_Background "gfx/HighScoreTable.bmp" BEST
+IMAGE NewHighScore_Background "gfx/HighScore.bmp" BEST
+
+
+// Fonts
+// ---------------------------
+IMAGE med_font "gfx/MedFont.bmp" NONE

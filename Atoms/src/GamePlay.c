@@ -29,6 +29,24 @@ anim m_Animations[] =
 };
 
 
+u16 m_RegularPalette[64];
+u16 m_FadedPalette[64];
+
+void SetupFadedPalette()
+{
+	for (int i = 0; i < 64; i++)
+	{
+		if (i < 12 || i > 16)
+		{
+			m_FadedPalette[i] = FADE_COLOUR(m_RegularPalette[i]);
+		}
+		else
+		{
+			m_FadedPalette[i] = m_RegularPalette[i];
+		}
+	}
+}
+
 
 void GridSetup()
 {

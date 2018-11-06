@@ -34,11 +34,16 @@ void ResetPad(Pad* pad)
 
 void UpdatePad(Pad* pad)
 {
-	u16 value = JOY_readJoypad(pad->Id);
-
+	u16 value = JOY_readJoypad(pad->Id);	
 	
 	pad->PrevState = pad->CurrentState;
 	pad->CurrentState = value;
+
+	if (pad->Id == JOY_TYPE_MOUSE)
+	{
+
+
+	}
 
 	pad->A = UpdateInput(pad->CurrentState, pad->PrevState, BUTTON_A);
 	pad->B = UpdateInput(pad->CurrentState, pad->PrevState, BUTTON_B);
@@ -49,4 +54,9 @@ void UpdatePad(Pad* pad)
 	pad->Down = UpdateInput(pad->CurrentState, pad->PrevState, BUTTON_DOWN);
 	pad->Left = UpdateInput(pad->CurrentState, pad->PrevState, BUTTON_LEFT);
 	pad->Right = UpdateInput(pad->CurrentState, pad->PrevState, BUTTON_RIGHT);
+}
+
+void UpdateMouse()
+{
+	
 }

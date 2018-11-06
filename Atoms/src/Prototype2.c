@@ -2,7 +2,6 @@
 #include <kdebug.h>
 
 #include "../inc/atoms.h"
-#include "../inc/Prototype1.h"
 #include "../inc/GamePlay.h"
 
 #include "../inc/PadHelper.h"
@@ -14,7 +13,8 @@
 #include "../inc/GameState.h"
 
 #include "../inc/Prototype2GameOverState.h"
-
+#include "../inc/ChallengeModeHighScoreState.h"
+#include "../inc/ChallengeModeSetNameState.h"
 
 #define SND_MOVE 67
 #define SND_GROW 68
@@ -49,8 +49,11 @@ static int m_AtomNeededCount[7];
 static int m_NextAtom;
 static int m_CurrentAtom;
 
-
-static const fix32 m_InitalMaxTime = intToFix32(2 * 40);
+#ifdef DEBUG
+static const fix32 m_InitalMaxTime = intToFix32(5);// intToFix32(2 * 40);
+#else
+static const fix32 m_InitalMaxTime =  intToFix32(2 * 40);
+#endif
 static const fix32 m_InitalTimePerExplosion = FIX32(2.0);
 
 
@@ -68,10 +71,6 @@ static Sprite* m_ScoreSpr[10];
 
 static Sprite* m_MessageSpr;
 
-
-static u16 m_RegularPalette[64];
-static u16 m_FadedPalette[64];
-
 static u16 m_BarColours[92];
 
 
@@ -83,10 +82,10 @@ static u16 m_BarColours[92];
 #define PROTO2_STATE_LEVEL_UP 4
 #define PROTO2_STATE_GAME_OVER 5
 #define PROTO2_STATE_RESET 6
+#define PROTO2_STATE_PAUSED 7
 
 
-// quick helper to half the value of the passed in colour
-#define FADE_COLOUR(x)  (((VDPPALETTE_REDMASK & x) / 2) | ((VDPPALETTE_BLUEMASK & x) / 2) | ((VDPPALETTE_GREENMASK & x) / 2 ))
+
 
 static int m_GameState = PROTO2_STATE_PLAY;
 
@@ -198,11 +197,6 @@ static void SetScore(int number)
 
 
 
-// random range
-int random_int(int min, int max)
-{
-	return min + random() % (max + 1 - min);
-}
 
 
 #define RandomBagCount 18
@@ -528,7 +522,17 @@ static void PlayerInput()
 		m_CursorX++;
 		XGM_startPlayPCM(SND_MOVE, 1, SOUND_PCM_CH2);
 	}
+	else if (m_Pad.START == PAD_RELEASED)
+	{
+		SPR_setAnim(m_MessageSpr, 2);
+		SPR_update();
+		SPR_setVisibility(m_MessageSpr, VISIBLE);
 
+		VDP_setPaletteColors(0, m_FadedPalette, 63);
+		m_GameState = PROTO2_STATE_PAUSED;
+		HideCursor();
+		return;
+	}
 
 	if (m_CursorX > 9)
 	{
@@ -693,7 +697,6 @@ void UpdateTime()
 	// the bar colour is based on how far though the range we are
 	if (ranged < 138 && ranged > 46)
 	{
-		XGM_setMusicTempo(60);
 		VDP_setPaletteColor(4, m_BarColours[ranged - 46]);
 	}
 	else if (ranged > 136)
@@ -739,11 +742,11 @@ void UpdateTime()
 	// the music tempo is changed if the user is running out of time
 	if (ranged > 136)
 	{
-		XGM_setMusicTempo(70);
+		XGM_setMusicTempo(65);
 	}
 	else if (ranged > 92)
 	{
-		XGM_setMusicTempo(65);
+		XGM_setMusicTempo(62);
 	}
 	else
 	{
@@ -756,8 +759,17 @@ void UpdateTime()
 
 void Protype2ScreenStart()
 {
+	u16 count = SPR_getNumActiveSprite();
+	KDebug_Alert("Protype2ScreenStart - active sprite count");
+	KDebug_AlertNumber(count);
+
 	// disable interrupt when accessing VDP
 	SYS_disableInts();
+
+	SPR_reset();
+	DMA_waitCompletion();
+	VDP_waitVSync();
+
 
 
 	// Set palette to black
@@ -776,9 +788,11 @@ void Protype2ScreenStart()
 	m_AtomTileStart = ind;
 	ind += atoms.tileset->numTile;	
 
+	
+
 	VDP_fillTileMapRect(PLAN_A, TILE_ATTR_FULL(PAL1, 0, 0, 0, m_AtomTileStart), 0, 0, 40, 28);
 
-	SYS_enableInts();
+	
 
 	m_Cursor = SPR_addSprite(&Cursor, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
 	SPR_setAnim(m_Cursor, 0);
@@ -834,6 +848,8 @@ void Protype2ScreenStart()
 	m_MessageSpr = SPR_addSprite(&messages, 84, 92, TILE_ATTR(PAL0, FALSE, FALSE, FALSE));
 	SPR_setVisibility(m_MessageSpr, HIDDEN);
 
+
+	SYS_enableInts();
 	// 88 * 200
 	// 11 * 25
 	// 
@@ -855,17 +871,7 @@ void Protype2ScreenStart()
 	memcpy(&m_RegularPalette[32], profs.palette->data, 16 * 2);
 	memcpy(&m_RegularPalette[48], robo_pal.palette->data, 16 * 2);
 
-	for (int i = 0; i < 64; i++)
-	{
-		if (i < 12 || i > 16)
-		{
-			m_FadedPalette[i] = FADE_COLOUR(m_RegularPalette[i]);
-		}
-		else
-		{
-			m_FadedPalette[i] = m_RegularPalette[i];
-		}
-	}
+	SetupFadedPalette();
 
 	GridSetup();
 
@@ -1142,7 +1148,30 @@ void Protype2ScreenUpdate()
 
 		case PROTO2_STATE_GAME_OVER:
 		{
-			StateMachineChange(&GameMachineState, &Prototype2GameOverState);
+			//StateMachineChange(&GameMachineState, &ChallengeModeHighScoreState);
+
+			if (m_Score > m_HighScoreAmounts[HIGHSCORE_TOTAL - 1])
+			{
+				StateMachineChange(&GameMachineState, &ChallengeModeSetNameState);
+			}
+			else
+			{
+				StateMachineChange(&GameMachineState, &Prototype2GameOverState);
+			}
+
+			return;
+		}
+
+		case PROTO2_STATE_PAUSED:
+		{
+			if (m_Pad.START == PAD_RELEASED)
+			{
+				SPR_setVisibility(m_MessageSpr, HIDDEN);
+				m_GameState = PROTO2_STATE_PLAY;
+				VDP_setPaletteColors(0, m_RegularPalette, 63);
+				UpdateCursor();
+			}
+
 			return;
 		}
 
@@ -1181,30 +1210,49 @@ void Protype2ScreenEnd()
 {
 	VDP_fadeOut(0, 63, 10, FALSE);	
 	XGM_setMusicTempo(60);
-	SPR_releaseSprite(m_NextAtomsSpr);
-	SPR_releaseSprite(m_Cursor);
-	SPR_releaseSprite(m_MessageSpr);
-	SPR_releaseSprite(m_CurrentAtomsSpr);
 
-	for (int i = 0; i < 12; i++)
+	SYS_disableInts();
+	
+	SPR_releaseSprite(m_MessageSpr);
+	
+	SPR_releaseSprite(m_MultiplerSpr[1]);
+	SPR_releaseSprite(m_MultiplerSpr[0]);
+
+
+	for (int i = 9; i >= 0; i--)
 	{
-		if (i < 6)
-		{
-			SPR_releaseSprite(m_AtomsSpr[i]);
-		}
-		if (i < 2)
-		{
-			SPR_releaseSprite(m_MultiplerSpr[i]);
-		}
-		if (i < 10)
-		{
-			SPR_releaseSprite(m_ScoreSpr[i]);
-		}
+		SPR_releaseSprite(m_ScoreSpr[i]);
+	}
+
+	for (int i = 11; i >= 0; i--)
+	{
 		SPR_releaseSprite(m_NumbersSpr[i]);
 	}
 
-	SPR_update();
-	VDP_resetScreen();
+	for (int i = 5; i >= 0; i--)
+	{
+		SPR_releaseSprite(m_AtomsSpr[i]);
+	}
+
+	SPR_releaseSprite(m_CurrentAtomsSpr);
+	SPR_releaseSprite(m_NextAtomsSpr);
+	SPR_releaseSprite(m_Cursor);
+
+	u16 count = SPR_getNumActiveSprite();
+	KDebug_Alert("Protype2ScreenStart - active sprite count");
+	KDebug_AlertNumber(count);
+
+
+	VDP_clearPlan(PLAN_A, TRUE);
+	VDP_clearPlan(PLAN_B, TRUE);
+
+	VDP_setVerticalScroll(PLAN_A, 0);
+	VDP_setHorizontalScroll(PLAN_A, 0);	
+
+	SYS_enableInts();
+
+	//SPR_update();
+	//VDP_resetScreen();
 }
 
 

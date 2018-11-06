@@ -70,4 +70,13 @@ void DrawAtom(int player, int x, int y, int size);
 void DrawFullGrid();
 void DrawGameGrid();
 
+
+// quick helper to half the value of the passed in colour
+#define FADE_COLOUR(x)  (((VDPPALETTE_REDMASK & x) / 2) | ((VDPPALETTE_BLUEMASK & x) / 2) | ((VDPPALETTE_GREENMASK & x) / 2 ))
+extern u16 m_RegularPalette[];
+extern u16 m_FadedPalette[];
+
+void SetupFadedPalette();
+
+
 #endif

@@ -14,14 +14,14 @@
 
 #include <kdebug.h>
 
-int m_PlayerType[] = {1,2,0,0,0,0};
+static int m_PlayerType[] = {1,2,0,0,0,0};
 
-Sprite* m_Players[6];
-Sprite* m_Cursor;
+static Sprite* m_Players[6];
+static Sprite* m_Cursor;
 
-Sprite* m_Buttons[3];
+static Sprite* m_Buttons[3];
 
-int m_PlayerSelectCurrentlySelected;
+static int m_PlayerSelectCurrentlySelected;
 
 
 void UpdateStart()
@@ -354,6 +354,7 @@ void PlayerSelectUpdate()
 			for (int i = 1; i < 7; i++)
 			{
 				m_PlayerSetup[i] = m_PlayerType[i - 1];
+
 			}
 
 			XGM_startPlayPCM(SND_START, 0, 2);

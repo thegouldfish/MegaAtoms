@@ -17,23 +17,27 @@
 #define STATE_ANIMATE 1
 #define STATE_ANIMATE_WAIT 2
 #define STATE_END_CHECK 3
-
+#define STATE_PAUSE 4
 
 static int m_TurnCount = 0;
 
 static int m_CurrentPlayer = 0;
+static int m_PlayerIndex = 0;
 
 static Sprite *m_Current;
 static Sprite *m_Next;
-
+static Sprite* m_MessageSpr;
 
 
 static int m_GameState = STATE_PLAY;
 
 static int m_GameFinished;
 static int m_Alive[7];
+static int m_TotalAtoms;
 
-
+static Sprite* m_ProgressBars[14];
+static Sprite* m_ProgressToppers[7];
+ 
 
 static int wait = 0;
 static Point m_CursorPositions[7];
@@ -47,6 +51,7 @@ static Point m_CursorPositions[7];
 
 int m_WinningPlayer = 0;
 int m_PlayerSetup[7];
+static int m_PlayerOrder[7];
 
 void SetupGame()
 {
@@ -99,6 +104,99 @@ void SetupGame()
 }
 
 
+void UpdateProgress()
+{
+	int sizes[7] = { 16,16,16,16,16,16,16 };
+
+	int i = 0;
+	if (m_TurnCount)
+	{
+		int max = 0;		
+		for (i = 1; i < 7; i++)
+		{
+			if (m_Alive[i] > max)
+			{
+				max = m_Alive[i];
+			}
+		}
+
+		for (i = 1; i < 7; i++)
+		{
+			if (m_Alive[i])
+			{
+				sizes[i] = (int)(((float)m_Alive[i] / (float)max) * 15.0f) + 1;
+			}
+			else
+			{
+				sizes[i] = 0;
+			}
+		}
+	}
+	else
+	{
+		for (i = 1; i < 7; i++)
+		{
+			if (m_PlayerSetup[i])
+			{
+				sizes[i] = 16;
+			}
+			else
+			{
+				sizes[i] = 0;
+			}
+		}
+	}
+
+	for (i = 1; i < 7; i++)
+	{
+		int topperMove = 0;
+		int bars[2];
+		if (sizes[i] > 8)
+		{
+			int size = sizes[i] - 8;
+			topperMove = 8 - size;
+			bars[0] = size;
+			bars[1] = 8;
+		}
+		else if (sizes[i] == 0)
+		{
+			topperMove = -1;
+			bars[0] = 0;
+			bars[1] = 0;
+
+		}
+		else
+		{
+			bars[0] = 0;
+			bars[1] = sizes[i];
+			topperMove = (8 - sizes[i]) + 8;
+		}
+
+		for (int j = 0; j < 2; j++)
+		{
+			int bar = ((i - 1) * 2) + j;
+			if (bars[j])
+			{
+				SPR_setVisibility(m_ProgressBars[bar], VISIBLE);
+				SPR_setAnimAndFrame(m_ProgressBars[bar], 9 - bars[j], i-1);
+			}
+			else
+			{
+				SPR_setVisibility(m_ProgressBars[bar], HIDDEN);
+			}
+
+			if (topperMove == -1)
+			{
+				SPR_setVisibility(m_ProgressToppers[i-1], HIDDEN);
+			}
+			else
+			{
+				SPR_setVisibility(m_ProgressToppers[i - 1], VISIBLE);
+				SPR_setPosition(m_ProgressToppers[i - 1], (i - 1) * 8, 26 + topperMove);
+			}
+		}
+	}
+}
 
 void SwitchPlayer()
 {
@@ -206,8 +304,9 @@ static void AnimateScreen()
 			}
 		}
 
+		m_TotalAtoms = 0;
 		if (m_TurnCount)
-		{
+		{			
 			for (j = 0; j < 7; j++)
 			{
 				m_Alive[j] = 0;
@@ -232,6 +331,7 @@ static void AnimateScreen()
 					allSame = 0;
 				}
 
+				
 				if (m_TurnCount)
 				{
 					m_Alive[player]++;
@@ -420,7 +520,7 @@ void UpdateUpNext()
 
 
 void AtomGameStart()
-{
+{	
 	// disable interrupt when accessing VDP
 	SYS_disableInts();
 
@@ -440,7 +540,7 @@ void AtomGameStart()
 	ind += ingame_back.tileset->numTile;
 
 	SYS_enableInts();
-	u16 palette[64];
+	//u16 palette[64];
 
 
 	VDP_setPalette(PAL1, atoms.palette->data);
@@ -456,21 +556,38 @@ void AtomGameStart()
 	m_Cursor = SPR_addSprite(&Cursor, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
 	SPR_setAnim(m_Cursor, 0);
 
+	m_MessageSpr = SPR_addSprite(&messages, 84, 92, TILE_ATTR(PAL0, FALSE, FALSE, FALSE));
+	SPR_setAnim(m_MessageSpr, 2);
+	SPR_setVisibility(m_MessageSpr, HIDDEN);
 
 
 	VDP_setVerticalScroll(PLAN_A, -28);
 	VDP_setHorizontalScroll(PLAN_A,60);
 
 
+	int y = 26;
+	for (int i = 0; i < 6; i++)
+	{
+		m_ProgressToppers[i] = SPR_addSprite(&Scalers, i * 8, y, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
+		SPR_setAnimAndFrame(m_ProgressToppers[i], 0, i);
+		
 
+		for (int j = 0; j < 2; j++)
+		{
+			m_ProgressBars[(i*2)+j] = SPR_addSprite(&Scalers, i * 8, y + 8 + (j * 8), TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
+			SPR_setAnimAndFrame(m_ProgressBars[(i * 2) + j],1, i);
+		}	
 
+	}
 
-
+	UpdateProgress();
 	// prepare palettes
-	memcpy(&palette[0], ingame_back.palette->data, 16 * 2);
-	memcpy(&palette[16], atoms.palette->data, 16 * 2);
-	memcpy(&palette[32], profs.palette->data, 16 * 2);
-	memcpy(&palette[48], robo_pal.palette->data, 16 * 2);
+	memcpy(&m_RegularPalette[0], ingame_back.palette->data, 16 * 2);
+	memcpy(&m_RegularPalette[16], atoms.palette->data, 16 * 2);
+	memcpy(&m_RegularPalette[32], profs.palette->data, 16 * 2);
+	memcpy(&m_RegularPalette[48], robo_pal.palette->data, 16 * 2);
+
+	SetupFadedPalette();
 
 	GridSetup();
 
@@ -499,7 +616,9 @@ void AtomGameStart()
 
 
 	// fade in
-	VDP_fadeIn(0, (4 * 16) - 1, palette, 20, FALSE);
+	VDP_fadeIn(0, (4 * 16) - 1, m_RegularPalette, 20, FALSE);
+
+	ResetPad(&m_Pad);
 }
 
 
@@ -594,7 +713,14 @@ static void PlayerInput()
 		m_CursorX++;
 		XGM_startPlayPCM(SND_MOVE, 1, SOUND_PCM_CH2);
 	}
-	
+	else if (m_Pad.START == PAD_RELEASED)
+	{
+		m_GameState = STATE_PAUSE;
+		HideCursor();
+		
+		SPR_setVisibility(m_MessageSpr, VISIBLE);
+		VDP_setPaletteColors(0, m_FadedPalette, 63);
+	}
 
 	if (m_CursorX > 9)
 	{
@@ -701,6 +827,7 @@ void AtomGameUpdate()
 			wait = 4;
 			DisableLoopingAnims();
 			AnimateScreen();
+			UpdateProgress();
 			break;
 		}
 
@@ -754,6 +881,23 @@ void AtomGameUpdate()
 
 				m_GameState = STATE_PLAY;
 			}
+			
+			break;
+		}
+
+		case STATE_PAUSE:
+		{
+			HideCursor();
+			if (m_Pad.START == PAD_RELEASED)
+			{
+				m_GameState = STATE_PLAY;
+				UpdateCursor();
+
+				SPR_setVisibility(m_MessageSpr, HIDDEN);
+				VDP_setPaletteColors(0, m_RegularPalette, 63);
+			}
+
+			break;
 		}
 	}
 

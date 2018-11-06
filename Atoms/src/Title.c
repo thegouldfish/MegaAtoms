@@ -15,7 +15,6 @@
 #include <kdebug.h>
 
 static int timer = 160;
-static int scroll = 0;
 
 static int animTimer = 0;
 static int frame = 0;
@@ -23,18 +22,28 @@ static u16 animPal[16];
 
 void TitleStart()
 {
+	SYS_disableInts();
+
 	int ind = TILE_USERINDEX;
 
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
 
-	VDP_setPalette(PAL1, gouldfish.palette->data);
-	VDP_drawImageEx(PLAN_B, &gouldfish, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+	
+	VDP_drawImageEx(PLAN_B, &logo_bg_1, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+	ind += logo_bg_1.tileset->numTile;
+
+	VDP_drawImageEx(PLAN_A, &logo_bg_2, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+
+
+
+	VDP_setPalette(PAL0, logo_bg_1.palette->data);
+	VDP_setPalette(PAL1, logo_bg_2.palette->data);
+
+	SYS_enableInts();
 
 
 	XGM_setPCM(65, gouldfish_chime, sizeof(gouldfish_chime));
-	XGM_startPlayPCM(65, 0, SOUND_PCM_CH2);
-
-	
+	XGM_startPlayPCM(65, 0, SOUND_PCM_CH2);	
 }
 
 
@@ -70,7 +79,7 @@ void TitleUpdate()
 	}
 	else if (timer == 0)
 	{						
-		VDP_fadeOut(16, 31, 20, FALSE);
+		VDP_fadeOut(0, 31, 20, FALSE);
 
 		SND_startPlay_XGM(xgm_1);
 
@@ -102,7 +111,7 @@ void TitleUpdate()
 		memcpy(&palette[16], title_front.palette->data, 16 * 2);
 
 		// fade in
-		VDP_fadeIn(0, 63, palette, 20, FALSE);	
+		VDP_fadeIn(0, 31, palette, 20, FALSE);	
 
 		// VDP_drawText("Press Start to Continue", 8, 24);
 
@@ -144,13 +153,7 @@ void TitleUpdate()
 		}
 
 		animTimer++;
-		
-		VDP_setPalette(PAL0, animPal);
-		
-
-		VDP_setHorizontalScroll(PLAN_B, scroll);
-		//VDP_setVerticalScroll(PLAN_B, scroll);
-
+				
 		u16 value = JOY_readJoypad(JOY_1);
 
 		if (value & BUTTON_A || value & BUTTON_START)
@@ -158,25 +161,18 @@ void TitleUpdate()
 			//StateMachineChange(&GameMachineState, &AtomsGameState);
 			//StateMachineChange(&GameMachineState, &PlayerSelectState);
 			StateMachineChange(&GameMachineState, &GameSelectState);
+			return;
 		}
+
+		VDP_setPalette(PAL0, animPal);
 	}
 }
 
 
 
 void TitleEnd()
-{
-	//VDP_clearText(8, 24, 24);
-
-
+{	
 	VDP_fadeOut(0, 31, 10, FALSE);
-
-
-	//VDP_fadeOut(16, 31, 20, FALSE);
-
-	VDP_setHilightShadow(FALSE);
-	
-
 }
 
 
