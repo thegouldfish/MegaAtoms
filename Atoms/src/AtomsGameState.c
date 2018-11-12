@@ -909,7 +909,7 @@ void AtomGameUpdate()
 
 void AtomGameEnd()
 {
-	VDP_fadeOut(0, 64, 20, FALSE);
+	VDP_fadeOut(0, 63, 20, FALSE);
 
 	SPR_setVisibility(m_Cursor, HIDDEN);
 	SPR_releaseSprite(m_Cursor);
@@ -919,10 +919,10 @@ void AtomGameEnd()
 	
 	SPR_setVisibility(m_Next, HIDDEN);
 	SPR_releaseSprite(m_Next);
-
+	
 	VDP_setVerticalScroll(PLAN_A, 0);
 	VDP_setHorizontalScroll(PLAN_A, 0);
-
+	
 	SPR_reset();
 	SPR_update();
 }
@@ -933,5 +933,6 @@ SimpleState AtomsGameState =
 {
 	AtomGameStart,
 	AtomGameUpdate,
-	AtomGameEnd
+	AtomGameEnd,
+	NULL
 };

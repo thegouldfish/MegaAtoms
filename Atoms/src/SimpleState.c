@@ -77,3 +77,12 @@ void StateMachineUpdate(StateMachine* machine)
 		*/
 	}
 }
+
+
+void StateMachineVInterrupt(StateMachine* machine)
+{
+	if (machine->CurrentState->VInterrupt != NULL)
+	{
+		machine->CurrentState->VInterrupt();
+	}
+}

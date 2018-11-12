@@ -12,6 +12,12 @@
 #include "../inc/ChallengeModeSetNameState.h"
 StateMachine GameMachineState;
 
+
+void VInterrupt()
+{
+	StateMachineVInterrupt(&GameMachineState);
+}
+
 int main()
 {	
     // disable interrupt when accessing VDP
@@ -37,6 +43,7 @@ int main()
 		SaveScores();
 	}
 
+	SYS_setVIntCallback(VInterrupt);
 
 #if DEBUG
 	m_Score = 20001;
@@ -46,10 +53,9 @@ int main()
 #endif
 
 	while(TRUE)
-    {
-        
-		
+    {        		
 		UpdatePad(&m_Pad);
+
 		StateMachineUpdate(&GameMachineState);
 
 		SPR_update();

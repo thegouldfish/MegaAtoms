@@ -12,8 +12,9 @@ typedef struct
 
 	_voidCallBack *End;
 
-	int TransisionIn;
+	_voidCallBack *VInterrupt;
 
+	int TransisionIn;
 	int TransisionOut;
 } SimpleState;
 
@@ -34,5 +35,6 @@ typedef struct
 void StateMachineStart(StateMachine* machine, SimpleState* state);
 void StateMachineChange(StateMachine* machine, SimpleState* state);
 void StateMachineUpdate(StateMachine* machine);
+void StateMachineVInterrupt(StateMachine* machine);
 
 #endif

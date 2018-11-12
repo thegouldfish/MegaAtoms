@@ -32,12 +32,7 @@ void ChallengeModeHighScoreStateStart()
 	SPR_reset();
 	DMA_waitCompletion();
 	VDP_waitVSync();
-
-	
-	// 6 x 7
-	
-
-	
+		
 
 	// Set palette to black
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
@@ -56,21 +51,10 @@ void ChallengeModeHighScoreStateStart()
 
 
 	
-	KDebug_Alert("buttons");
 	int i = 0;
 	for (i = 0; i < 2; i++)
 	{
 		m_Buttons[i] = SPR_addSprite(&controller, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
-		KDebug_AlertNumber(i);
-		
-		if (m_Buttons[i] != NULL)
-		{
-			KDebug_AlertNumber(m_Buttons[i]->VDPSpriteIndex);
-		}
-		else
-		{
-			KDebug_Alert("NULL");
-		}
 	}
 
 
@@ -80,8 +64,8 @@ void ChallengeModeHighScoreStateStart()
 	SPR_setFrame(m_Buttons[1], 3);	
 	SPR_setPosition(m_Buttons[1], 242, 188);
 
-	VDP_drawText("for", 20, 24);
-	VDP_drawText("tutorial", 20, 25);
+	VDP_drawText("How to", 20, 24);
+	VDP_drawText("Play", 20, 25);
 
 	VDP_drawText("to", 34, 24);
 	VDP_drawText("start", 34, 25);
@@ -129,8 +113,6 @@ void ChallengeModeHighScoreStateUpdate()
 {
 	if (m_Pad.START == PAD_RELEASED)
 	{
-		//XGM_startPlayPCM(SND_START, 0, 2);
-
 		StateMachineChange(&GameMachineState, &Protype2ScreenState);
 	}
 	else if (m_Pad.B == PAD_RELEASED)
@@ -157,10 +139,6 @@ void ChallengeModeHighScoreStateEnd()
 	VDP_clearTextArea(0, 24, 40, 2);
 
 	SYS_enableInts();
-
-	u16 count = SPR_getNumActiveSprite();
-	KDebug_Alert("ChallengeModeHighScoreStateEnd - active sprite count");
-	KDebug_AlertNumber(count);
 }
 
 
@@ -168,5 +146,6 @@ SimpleState ChallengeModeHighScoreState =
 {
 	ChallengeModeHighScoreStateStart,
 	ChallengeModeHighScoreStateUpdate,
-	ChallengeModeHighScoreStateEnd
+	ChallengeModeHighScoreStateEnd,
+	NULL
 };

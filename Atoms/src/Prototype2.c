@@ -1260,5 +1260,6 @@ SimpleState Protype2ScreenState =
 {
 	Protype2ScreenStart,
 	Protype2ScreenUpdate,
-	Protype2ScreenEnd
+	Protype2ScreenEnd,
+	NULL
 };

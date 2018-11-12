@@ -7,6 +7,9 @@
 #include "../inc/GameSelectState.h"
 
 #include "../inc/GameState.h"
+#include "../inc/atoms.h"
+#include "../inc/PadHelper.h"
+
 
 #include "../res/gfx.h"
 #include "../res/sound.h"
@@ -22,6 +25,11 @@ static u16 animPal[16];
 
 void TitleStart()
 {
+	frame = 0;
+	animTimer = 0;
+	timer = 160;
+
+
 	SYS_disableInts();
 
 	int ind = TILE_USERINDEX;
@@ -44,6 +52,8 @@ void TitleStart()
 
 	XGM_setPCM(65, gouldfish_chime, sizeof(gouldfish_chime));
 	XGM_startPlayPCM(65, 0, SOUND_PCM_CH2);	
+
+	ResetPad(&m_Pad);
 }
 
 
@@ -153,18 +163,12 @@ void TitleUpdate()
 		}
 
 		animTimer++;
-				
-		u16 value = JOY_readJoypad(JOY_1);
 
-		if (value & BUTTON_A || value & BUTTON_START)
+		if (m_Pad.A == PAD_RELEASED || m_Pad.START == PAD_RELEASED)
 		{
-			//StateMachineChange(&GameMachineState, &AtomsGameState);
-			//StateMachineChange(&GameMachineState, &PlayerSelectState);
 			StateMachineChange(&GameMachineState, &GameSelectState);
 			return;
-		}
-
-		VDP_setPalette(PAL0, animPal);
+		}		
 	}
 }
 
@@ -176,10 +180,19 @@ void TitleEnd()
 }
 
 
+void TitleVInterupt()
+{
+	if (timer < 0)
+	{
+		VDP_setPalette(PAL0, animPal);
+	}
+}
+
 
 SimpleState TitleState =
 {
 	TitleStart,
 	TitleUpdate,
-	TitleEnd
+	TitleEnd,
+	TitleVInterupt
 };

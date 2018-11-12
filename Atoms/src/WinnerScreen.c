@@ -5,16 +5,17 @@
 #include "../inc/GameState.h"
 #include "../inc/AtomsGameState.h"
 #include "../inc/PlayerSelectState.h"
+#include "../inc/PadHelper.h"
+#include "../inc/atoms.h"
+
+
+static u8 m_Delay = 0;
+static u8 m_DelayTime = 20;
 
 void WinnerScreenStart()
 {
 	// disable interrupt when accessing VDP
 	SYS_disableInts();
-
-	// Clear anything left over from the previous state
-	//VDP_resetScreen();
-	//SPR_reset();
-
 
 	// Set palette to black
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
@@ -23,7 +24,7 @@ void WinnerScreenStart()
 
 
 	//VDP_setPalette(PAL0, ingame_back.palette->data);
-	VDP_drawImageEx(PLAN_B, &winner_background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, CPU);
+	VDP_drawImageEx(PLAN_B, &winner_background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA);
 	ind += winner_background.tileset->numTile;
 
 	
@@ -83,7 +84,7 @@ void WinnerScreenStart()
 	}
 	
 	
-	VDP_drawImageEx(PLAN_A, winner, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, CPU);
+	VDP_drawImageEx(PLAN_A, winner, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA);
 	ind += winner->tileset->numTile;
 
 	SYS_enableInts();
@@ -96,23 +97,27 @@ void WinnerScreenStart()
 
 	// fade in
 	VDP_fadeIn(0, (2 * 16) - 1, palette, 20, FALSE);
+
+	m_Delay = 0;
+	ResetPad(&m_Pad);
 }
 
 void WinnerScreenUpdate()
 {
-	u16 value = JOY_readJoypad(JOY_1);
+	m_Delay++;
 
-	if (value & BUTTON_A || value & BUTTON_START)
+	if (m_Delay > m_DelayTime)
 	{
-		//StateMachineChange(&GameMachineState, &AtomsGameState);
-		StateMachineChange(&GameMachineState, &PlayerSelectState);
+		if (m_Pad.A == PAD_RELEASED || m_Pad.START == PAD_RELEASED)
+		{
+			StateMachineChange(&GameMachineState, &PlayerSelectState);
+		}
 	}
 }
 
 void WinnerScreenEnd()
 {
-
-
+	VDP_fadeOut(0, 63, 10, FALSE);
 }
 
 
@@ -120,5 +125,6 @@ SimpleState WinnerScreenState=
 {
 	WinnerScreenStart,
 	WinnerScreenUpdate,
-	WinnerScreenEnd	
+	WinnerScreenEnd,
+	NULL
 };

@@ -266,5 +266,6 @@ SimpleState ChallengeModeSetNameState =
 {
 	ChallengeModeSetNameStateStart,
 	ChallengeModeSetNameStateUpdate,
-	ChallengeModeSetNameStateEnd
+	ChallengeModeSetNameStateEnd,
+	NULL
 };

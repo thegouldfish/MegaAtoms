@@ -70,5 +70,6 @@ SimpleState GameSelectState =
 {
 	GameSelectStateStart,
 	GameSelectStateUpdate,
-	GameSelectStateEnd
+	GameSelectStateEnd,
+	NULL
 };

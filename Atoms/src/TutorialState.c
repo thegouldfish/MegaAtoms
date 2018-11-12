@@ -577,6 +577,9 @@ void TutorialStateUpdate()
 void TutorialStateEnd()
 {
 	VDP_fadeOut(0, 63, 20, FALSE);
+
+	VDP_setVerticalScroll(PLAN_A, 0);
+	VDP_setHorizontalScroll(PLAN_A, 0);
 }
 
 
@@ -584,5 +587,6 @@ SimpleState TutorialState =
 {
 	TutorialStateStart,
 	TutorialStateUpdate,
-	TutorialStateEnd
+	TutorialStateEnd,
+	NULL
 };

@@ -210,6 +210,9 @@ void ChallengeModeTutorialStateUpdate()
 void ChallengeModeTutorialStateEnd()
 {
 	VDP_fadeOut(0, 63, 20, FALSE);
+
+	VDP_setVerticalScroll(PLAN_A, 0);
+	VDP_setHorizontalScroll(PLAN_A, 0);
 }
 
 
@@ -217,5 +220,6 @@ SimpleState ChallengeModeTutorialState=
 {
 	ChallengeModeTutorialStateStart,
 	ChallengeModeTutorialStateUpdate,
-	ChallengeModeTutorialStateEnd
+	ChallengeModeTutorialStateEnd,
+	NULL
 };

@@ -154,5 +154,6 @@ SimpleState Prototype2GameOverState =
 {
 	Prototype2GameOverStateStart,
 	Prototype2GameOverStateUpdate,
-	Prototype2GameOverStateEnd
+	Prototype2GameOverStateEnd,
+	NULL
 };
