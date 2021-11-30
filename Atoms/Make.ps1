@@ -9,7 +9,7 @@ param
     [String]$SourceLocation = "",
     [String]$AssemblyName = "",
     [String]$Flavour = "Release",
-    [String]$SGDK = "E:\Programming\sgdk134" # Set me
+    [String]$SGDK = "E:\Programming\SGDK134" # Set me
 )
 
 if(-not $Action)
@@ -37,6 +37,7 @@ $env:Path = "$($env:Path);$($env:GDK_WIN)\bin"
 
 
 Write-Host "--== SGDK Compiler Script ==--"
+Write-Host ([datetime]::Now)
 Write-Host "Action: $Action"
 Write-Host "SourceLocation: $SourceLocation"
 Write-Host "OutFolder: $OutFolder"
@@ -45,7 +46,7 @@ Write-Host "ObjectFolder: $ObjectFolder"
 Write-Host "Flavour: $Flavour"
 
 
-
+set-Location $SourceLocation
 
 
 
@@ -134,6 +135,8 @@ function CleanCode()
     Remove-Item "out" -Recurse -Force
 }
 
+
+write-host "Location: $(get-Location)"
 
 Try
 {

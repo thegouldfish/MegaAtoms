@@ -54,9 +54,6 @@
     <ClInclude Include="inc\TutorialState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Prototype1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\GamePlay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -70,6 +67,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Prototype2GameOverState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ChallengeModeHighScoreState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TextHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ChallengeModeSetNameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ChallengeModeTutorialState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -115,9 +124,6 @@
     <ClCompile Include="src\TutorialState.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Prototype1.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GamePlay.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -131,6 +137,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Prototype2GameOverState.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChallengeModeHighScoreState.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextHelpers.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChallengeModeSetNameState.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChallengeModeTutorialState.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

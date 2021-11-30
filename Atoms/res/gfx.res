@@ -1,12 +1,10 @@
-// IMAGE bgb_image "gfx/bgb.png" BEST
-
 // Title screen
 IMAGE title_front "gfx/TitleFront.bmp" BEST
 IMAGE title_anim "gfx/title_anim_more.bmp" BEST
 
 
 IMAGE logo_bg_1 "gfx/logo_bg_1.bmp" BEST
-IMAGE logo_bg_2 "gfx/logo_bg_2.bmp" BEST
+IMAGE logo_bg_2 "gfx/logo_bg_2_2.bmp" BEST
 
 
 // General
@@ -14,7 +12,7 @@ IMAGE atoms "gfx/atoms_anims2.bmp" NONE
 
 
 
-// Multiplayer Game
+// Classic Mode
 // ---------------------------
 // Player Select
 IMAGE playerselect_background "gfx/MenuBacking.bmp" BEST
@@ -39,7 +37,9 @@ IMAGE winner_ai2 "gfx/winner/image8.bmp" BEST
 IMAGE winner_ai3 "gfx/winner/image9.bmp" BEST
 IMAGE winner_ai4 "gfx/winner/image10.bmp" BEST
 IMAGE winner_ai5 "gfx/winner/image11.bmp" BEST
-IMAGE winner_ai6 "gfx/winner/image11.bmp" BEST
+IMAGE winner_ai6 "gfx/winner/image12.bmp" BEST
+
+
 
 // Tutorial
 IMAGE tutorial_backing "gfx/tutorial.bmp" BEST
@@ -54,7 +54,7 @@ IMAGE GameSelect "gfx/GameSelect2.bmp" BEST
 
 
 
-// Prototype 2
+// Challenge Mode
 // ---------------------------
 IMAGE Prototype2_Background "gfx/Prototype2Background.bmp" NONE
 

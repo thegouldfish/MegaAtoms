@@ -11,6 +11,7 @@ extern const SpriteDefinition NumbersBig;
 extern const SpriteDefinition AtomsSample;
 extern const SpriteDefinition Scalers;
 extern const SpriteDefinition messages;
+extern const SpriteDefinition playerSelectOptions;
 extern const SpriteDefinition TextCursor_Sprite;
 
 #endif // _RES_SPRITE_H_

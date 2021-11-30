@@ -22,7 +22,6 @@
 static int m_TurnCount = 0;
 
 static int m_CurrentPlayer = 0;
-static int m_PlayerIndex = 0;
 
 static Sprite *m_Current;
 static Sprite *m_Next;
@@ -39,7 +38,6 @@ static Sprite* m_ProgressBars[14];
 static Sprite* m_ProgressToppers[7];
  
 
-static int wait = 0;
 static Point m_CursorPositions[7];
 
 
@@ -51,7 +49,7 @@ static Point m_CursorPositions[7];
 
 int m_WinningPlayer = 0;
 int m_PlayerSetup[7];
-static int m_PlayerOrder[7];
+
 
 void SetupGame()
 {
@@ -535,16 +533,14 @@ void AtomGameStart()
 	int ind = TILE_USERINDEX;
 
 
-	//VDP_setPalette(PAL0, ingame_back.palette->data);
-	VDP_drawImageEx(PLAN_B, &ingame_back, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
-	ind += ingame_back.tileset->numTile;
 
 	SYS_enableInts();
-	//u16 palette[64];
+
+	VDP_drawImageEx(PLAN_B, &ingame_back, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
+	ind += ingame_back.tileset->numTile;
 
 
-	VDP_setPalette(PAL1, atoms.palette->data);
-	VDP_loadTileSet(atoms.tileset, ind, CPU);
+	VDP_loadTileSet(atoms.tileset, ind, DMA_QUEUE);
 
 	m_AtomTileStart = ind;
 	ind += atoms.tileset->numTile;
@@ -581,6 +577,7 @@ void AtomGameStart()
 	}
 
 	UpdateProgress();
+
 	// prepare palettes
 	memcpy(&m_RegularPalette[0], ingame_back.palette->data, 16 * 2);
 	memcpy(&m_RegularPalette[16], atoms.palette->data, 16 * 2);
@@ -592,8 +589,6 @@ void AtomGameStart()
 	GridSetup();
 
 	HideCursor();
-
-	//DrawFullGrid();
 
 	SetupGame();
 
@@ -823,8 +818,6 @@ void AtomGameUpdate()
 
 		case STATE_ANIMATE:
 		{
-
-			wait = 4;
 			DisableLoopingAnims();
 			AnimateScreen();
 			UpdateProgress();
@@ -841,8 +834,6 @@ void AtomGameUpdate()
 					animating++;
 				}
 			}
-
-			//wait--;
 
 			if (!animating)
 			{

@@ -37,17 +37,20 @@ void TitleStart()
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
 
 	
-	VDP_drawImageEx(PLAN_B, &logo_bg_1, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+	SYS_enableInts();
+
+
+	VDP_drawImageEx(PLAN_B, &logo_bg_1, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 	ind += logo_bg_1.tileset->numTile;
 
-	VDP_drawImageEx(PLAN_A, &logo_bg_2, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+	VDP_drawImageEx(PLAN_A, &logo_bg_2, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 
 
 
 	VDP_setPalette(PAL0, logo_bg_1.palette->data);
 	VDP_setPalette(PAL1, logo_bg_2.palette->data);
 
-	SYS_enableInts();
+	
 
 
 	XGM_setPCM(65, gouldfish_chime, sizeof(gouldfish_chime));
@@ -96,23 +99,27 @@ void TitleUpdate()
 		// disable interrupt when accessing VDP
 		SYS_disableInts();
 
+		VDP_setPaletteColors(0, (u16*)palette_black, 64);
+
 		VDP_setHilightShadow(FALSE);
+		
+		SYS_enableInts();
 		int ind = TILE_USERINDEX;
 		
-		VDP_drawImageEx(PLAN_B, &title_anim, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+		VDP_drawImageEx(PLAN_B, &title_anim, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 		ind += title_anim.tileset->numTile;
 
-		VDP_drawImageEx(PLAN_A, &title_front, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+		VDP_drawImageEx(PLAN_A, &title_front, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 
 		VDP_setTextPalette(PAL0);
 		
 
-		SYS_enableInts();
+		
 
 
 		
 		u16 palette[64];
-		memset(palette, 0, 64);
+		memset(palette, 0, 128);
 
 		memcpy(&animPal, title_anim.palette->data, 16 * 2);
 		AnimatePalette(9, 1);

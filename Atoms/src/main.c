@@ -34,7 +34,7 @@ int main()
 	SetupPad(&m_Pad, JOY_1);
 
 	DefaultScores();
-
+	//VDP_setPlanSize(32, 32);
 	
 	SRAM_enable();
 	if (!LoadScores())

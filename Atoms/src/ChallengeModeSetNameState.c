@@ -131,7 +131,7 @@ void ChallengeModeSetNameStateStart()
 
 
 	u16 palette[64];
-	memset(palette, 0, 64);
+	memset(palette, 0, 128);
 
 
 	memcpy(&palette[0], NewHighScore_Background.palette->data, 16 * 2);

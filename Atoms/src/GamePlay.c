@@ -12,6 +12,9 @@ int m_CursorY = 0;
 Sprite* m_Cursor = 0;
 
 
+#define TileCount 1344
+u16 m_DrawGrid[TileCount];
+
 anim m_Animations[] =
 {
 	{ 1,4,2,0 }, // Grow to 1
@@ -99,6 +102,8 @@ void GridSetup()
 			i++;
 		}
 	}
+
+	memset(m_DrawGrid, 0, TileCount << 1);
 }
 
 
@@ -150,7 +155,8 @@ void HideCursor()
 }
 
 
-void DrawAtom(int player, int x, int y, int size)
+
+void DrawAtom(int player, int x, int y, int size, int gridSquare)
 {
 	if (player < 0)
 	{
@@ -159,31 +165,31 @@ void DrawAtom(int player, int x, int y, int size)
 	}
 
 	int startingFrame = 0;
-	int animate = m_PlayerGrid[(y * 10) + x].Animate;
+	int animate = m_PlayerGrid[gridSquare].Animate;
 	if (animate >= 0)
 	{
 		anim* details = &m_Animations[animate];
-		m_PlayerGrid[(y * 10) + x].FrameCounter++;
+		m_PlayerGrid[gridSquare].FrameCounter++;
 
-		if (m_PlayerGrid[(y * 10) + x].FrameCounter > details->FrameRate)
+		if (m_PlayerGrid[gridSquare].FrameCounter > details->FrameRate)
 		{
-			m_PlayerGrid[(y * 10) + x].Frame++;
-			m_PlayerGrid[(y * 10) + x].FrameCounter = 0;
+			m_PlayerGrid[gridSquare].Frame++;
+			m_PlayerGrid[gridSquare].FrameCounter = 0;
 		}
 
-		if (m_PlayerGrid[(y * 10) + x].Frame >= details->Count)
+		if (m_PlayerGrid[gridSquare].Frame >= details->Count)
 		{
 			if (details->Loop)
 			{
-				m_PlayerGrid[(y * 10) + x].Frame = 0;
+				m_PlayerGrid[gridSquare].Frame = 0;
 			}
 			else
 			{
-				m_PlayerGrid[(y * 10) + x].Animate = -1;
-				m_PlayerGrid[(y * 10) + x].Frame = details->Count - 1;
+				m_PlayerGrid[gridSquare].Animate = -1;
+				m_PlayerGrid[gridSquare].Frame = details->Count - 1;
 			}
 		}
-		startingFrame = (details->Start + m_PlayerGrid[(y * 10) + x].Frame);
+		startingFrame = (details->Start + m_PlayerGrid[gridSquare].Frame);
 	}
 	else
 	{
@@ -197,7 +203,8 @@ void DrawAtom(int player, int x, int y, int size)
 		}
 	}
 
-	u16 t = (startingFrame * 3 * 6 * 3) + (player * 3);
+	u16 tileMapIndex = (startingFrame * 3 * 6 * 3) + (player * 3);
+	u16 gridLocation = ((y * 3) << 6) + (x * 3);
 	for (int row = 0; row < 3; row++)
 	{
 		for (int column = 0; column < 3; column++)
@@ -205,12 +212,15 @@ void DrawAtom(int player, int x, int y, int size)
 			u16 tile = m_AtomTileStart;
 			if (size != 0)
 			{
-				tile += atoms.map->tilemap[t];
+				tile += atoms.map->tilemap[tileMapIndex];
 			}
-			VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, tile), column + (x * 3), row + (y * 3));
-			t++;
+			m_DrawGrid[gridLocation] = TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, tile);
+
+			gridLocation++;
+			tileMapIndex++;
 		}
-		t += 15;
+		gridLocation += 61;
+		tileMapIndex += 15;
 	}
 }
 
@@ -230,7 +240,7 @@ void DrawFullGrid()
 				maxSize = 5;
 
 			int rnd = (((y + x)* y) + 5 / (x + 1)) % (6);
-			DrawAtom(rnd, x, y, maxSize);
+			DrawAtom(rnd, x, y, maxSize, (y * 10) + x);
 		}
 	}
 }
@@ -241,17 +251,21 @@ void DrawGameGrid()
 	int x = 0;
 	int y = 0;
 
+	int playerGridLocation = 0;
 	for (y = 0; y < 7; y++)
 	{
 		for (x = 0; x < 10; x++)
-		{
-			int size = m_PlayerGrid[(y * 10) + x].Size;
+		{		
+			int size = m_PlayerGrid[playerGridLocation].Size;
 			if (size == 5)
 			{
 				size = 4;
 			}
-
-			DrawAtom(m_PlayerGrid[(y * 10) + x].Player - 1, x, y, size);
+			DrawAtom(m_PlayerGrid[playerGridLocation].Player - 1, x, y, size, playerGridLocation);
+			
+			playerGridLocation++;
 		}
 	}
+
+	VDP_setTileMapData(VDP_PLAN_A, m_DrawGrid, 0, TileCount, DMA);	
 }

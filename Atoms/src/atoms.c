@@ -9,14 +9,14 @@ Pad m_Pad;
 u32 m_HighScoreAmounts[HIGHSCORE_TOTAL];
 char m_HighScoreNames[HIGHSCORE_TOTAL][HIGHSCORE_CHARS];
 
-static u8 m_Version = 1;
+static u8 m_Version = 2;
 
 void DefaultScores()
 {
-	m_HighScoreAmounts[0] = 20000l;
-	m_HighScoreAmounts[1] = 10000l;
-	m_HighScoreAmounts[2] = 2000l;
-	m_HighScoreAmounts[3] = 1000l;
+	m_HighScoreAmounts[0] = 3000l;
+	m_HighScoreAmounts[1] = 2000l;
+	m_HighScoreAmounts[2] = 1000l;
+	m_HighScoreAmounts[3] = 500l;
 	m_HighScoreAmounts[4] = 200l;
 
 	strcpy(m_HighScoreNames[0], "GFG");
@@ -37,7 +37,7 @@ int random_int(int min, int max)
 
 void SaveScores()
 {
-	KDebug_Alert("SRAM SAVE - Start");
+	////KDebug_Alert("SRAM SAVE - Start");
 	// Only load if versions match
 	
 	SRAM_writeByte(0, m_Version);
@@ -55,22 +55,22 @@ void SaveScores()
 		}
 	}
 
-	KDebug_AlertNumber(currentByte);
-	KDebug_Alert("SRAM SAVE - End");
+	////KDebug_AlertNumber(currentByte);
+	////KDebug_Alert("SRAM SAVE - End");
 
 }
 
 
 u8 LoadScores()
 {	
-	KDebug_Alert("SRAM Load - Start");
+	////KDebug_Alert("SRAM Load - Start");
 	
 	// Only load if versions match
 	// this could be due to a newer version of the save data
 	// or there isn't any save data
 	u8 version = SRAM_readByte(0);
 
-	KDebug_AlertNumber(version);
+	////KDebug_AlertNumber(version);
 	
 	u8 result = FALSE;
 	u32 currentByte = 1;
@@ -95,8 +95,8 @@ u8 LoadScores()
 	}
 
 	
-	KDebug_AlertNumber(currentByte);
-	KDebug_Alert("SRAM Load - End");
+	////KDebug_AlertNumber(currentByte);
+	////KDebug_Alert("SRAM Load - End");
 
 	return result;
 }

@@ -21,18 +21,18 @@
 #define SND_START 66
 void GameSelectStateStart()
 {
-	SYS_disableInts();
+//	SYS_disableInts();
 
 	int ind = TILE_USERINDEX;
 	
-	VDP_drawImageEx(PLAN_A, &GameSelect, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA);
+	VDP_drawImageEx(PLAN_A, &GameSelect, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 	ind += GameSelect.tileset->numTile;	
 
-	SYS_enableInts();
+//	SYS_enableInts();
 	
 
 	u16 palette[64];
-	memset(palette, 0, 64);
+	memset(palette, 0, 128);
 
 	memcpy(&palette[0], GameSelect.palette->data, 16 * 2);
 	

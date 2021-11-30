@@ -66,7 +66,7 @@ int SizeAtSquare(int x, int y);
 
 
 
-void DrawAtom(int player, int x, int y, int size);
+void DrawAtom(int player, int x, int y, int size, int gridSquare);
 void DrawFullGrid();
 void DrawGameGrid();
 

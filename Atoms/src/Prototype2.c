@@ -54,7 +54,7 @@ static const fix32 m_InitalMaxTime = intToFix32(5);// intToFix32(2 * 40);
 #else
 static const fix32 m_InitalMaxTime =  intToFix32(2 * 40);
 #endif
-static const fix32 m_InitalTimePerExplosion = FIX32(2.0);
+static const fix32 m_InitalTimePerExplosion = FIX32(1.5);
 
 
 static fix32 m_Time;
@@ -102,7 +102,7 @@ static void printGrid()
 {
 	return;
 	char t[110];
-	KDebug_Alert("PrintGrid");
+	//KDebug_Alert("PrintGrid");
 	for (int y = 0; y < 7; y++)
 	{
 		for (int x = 0; x < 10; x++)
@@ -119,9 +119,9 @@ static void printGrid()
 			t[(x * 10) + 9] = ' ';			
 		}
 		t[100] = 0;
-		KDebug_Alert(t);
+		//KDebug_Alert(t);
 	}
-	KDebug_Alert("-----");
+	//KDebug_Alert("-----");
 
 }
 
@@ -205,7 +205,7 @@ static int m_CurrentRnd = 0;
 
 static void SetupRandom(int prev)
 {
-	KDebug_Alert("SetupRandom:Start");
+	///KDebug_Alert("SetupRandom:Start");
 	for (int i = 0; i < RandomBagCount; i++)
 	{
 		m_RandomBag[i] = 0;
@@ -239,7 +239,7 @@ static void SetupRandom(int prev)
 					if (count == 0)
 					{
 						prev = rnd;
-						//KDebug_AlertNumber(rnd);
+						////KDebug_AlertNumber(rnd);
 						m_RandomBag[place + i] = rnd;
 						break;
 					}
@@ -247,7 +247,7 @@ static void SetupRandom(int prev)
 			}
 		}
 	}
-	KDebug_Alert("SetupRandom:End");
+	//KDebug_Alert("SetupRandom:End");
 }
 
 
@@ -331,7 +331,7 @@ static void AnimateScreen()
 
 						//char blah[30];
 						//sprintf(blah, "anim %d - %d - %d", i, m_PlayerGrid[i].Animate, m_PlayerGrid[i].Size);
-						//KDebug_Alert(blah);
+						////KDebug_Alert(blah);
 
 
 						m_AtomNeededCount[m_PlayerGrid[i].Player]--;
@@ -438,7 +438,7 @@ static void AnimateScreen()
 		// Allow for early out!
 		if (allSame)
 		{
-			KDebug_Alert("Early out");
+			//KDebug_Alert("Early out");
 			animating = 0;
 			m_EarlyOut = 1;
 			m_GameState = PROTO2_STATE_END_CHECK;
@@ -760,15 +760,17 @@ void UpdateTime()
 void Protype2ScreenStart()
 {
 	u16 count = SPR_getNumActiveSprite();
-	KDebug_Alert("Protype2ScreenStart - active sprite count");
-	KDebug_AlertNumber(count);
+	//KDebug_Alert("Protype2ScreenStart - active sprite count");
+	//KDebug_AlertNumber(count);
+
+
+	SPR_reset();
+	VDP_waitVSync();
+
 
 	// disable interrupt when accessing VDP
 	SYS_disableInts();
 
-	SPR_reset();
-	DMA_waitCompletion();
-	VDP_waitVSync();
 
 
 
@@ -779,11 +781,13 @@ void Protype2ScreenStart()
 
 
 	//VDP_setPalette(PAL0, ingame_back.palette->data);
-	VDP_drawImageEx(PLAN_B, &Prototype2_Background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+	VDP_drawImageEx(PLAN_B, &Prototype2_Background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 	ind += Prototype2_Background.tileset->numTile;
 
 	//VDP_setPalette(PAL1, atoms.palette->data);
-	VDP_loadTileSet(atoms.tileset, ind, CPU);
+	VDP_loadTileSet(atoms.tileset, ind, DMA_QUEUE);
+	
+	SYS_enableInts();
 
 	m_AtomTileStart = ind;
 	ind += atoms.tileset->numTile;	
@@ -849,7 +853,7 @@ void Protype2ScreenStart()
 	SPR_setVisibility(m_MessageSpr, HIDDEN);
 
 
-	SYS_enableInts();
+	
 	// 88 * 200
 	// 11 * 25
 	// 
@@ -1137,6 +1141,7 @@ void Protype2ScreenUpdate()
 				VDP_setPaletteColors(0, m_RegularPalette, 63);
 				SPR_setVisibility(m_MessageSpr, HIDDEN);
 				AnimateScreen();
+				EnableLoopingAnims();
 				m_GameState = PROTO2_STATE_PLAY;
 				m_levelWait = WAITFOR + 1;
 				UpdateCursor();
@@ -1239,8 +1244,8 @@ void Protype2ScreenEnd()
 	SPR_releaseSprite(m_Cursor);
 
 	u16 count = SPR_getNumActiveSprite();
-	KDebug_Alert("Protype2ScreenStart - active sprite count");
-	KDebug_AlertNumber(count);
+	//KDebug_Alert("Protype2ScreenStart - active sprite count");
+	//KDebug_AlertNumber(count);
 
 
 	VDP_clearPlan(PLAN_A, TRUE);

@@ -90,7 +90,7 @@ void Prototype2GameOverStateStart()
 
 
 	u16 palette[64];
-	memset(palette, 0, 64);
+	memset(palette, 0, 128);
 
 
 	memcpy(&palette[0], GameOver_Background.palette->data, 16 * 2);

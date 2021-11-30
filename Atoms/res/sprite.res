@@ -17,4 +17,6 @@ SPRITE Scalers "sprite/scalers.bmp" 1 1 BEST 0
 
 SPRITE messages "sprite/messages.bmp" 23 5 BEST 0
 
+SPRITE playerSelectOptions "sprite/PlayerSelect.bmp" 29 7 BEST 0
+
 SPRITE TextCursor_Sprite "sprite/TextCursor.bmp" 2 1 BEST 0

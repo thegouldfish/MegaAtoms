@@ -127,16 +127,17 @@ void PlayerSelectStart()
 	// Clear anything left over from the previous state
 	VDP_resetScreen();
 	SPR_reset();
+	SYS_enableInts();
 
 	// Set palette to black
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
 	int ind = TILE_USERINDEX;
 
 	
-	VDP_drawImageEx(PLAN_B, &playerselect_background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+	VDP_drawImageEx(PLAN_B, &playerselect_background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 	ind += playerselect_background.tileset->numTile;
-	VDP_drawImageEx(PLAN_A, &playerselect_stands_background, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
-	SYS_enableInts();
+	VDP_drawImageEx(PLAN_A, &playerselect_stands_background, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
+	
 
 	int i = 0;
 	for (i = 0; i < 6; i++)

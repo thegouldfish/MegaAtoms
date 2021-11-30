@@ -93,7 +93,7 @@ void Part1Start()
 	VDP_clearTextArea(0, 0, 40, 28);
 
 	//VDP_setPalette(PAL0, ingame_back.palette->data);
-	VDP_drawImageEx(PLAN_B, &tutorial_backing, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA);
+	VDP_drawImageEx(PLAN_B, &tutorial_backing, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 	ind += tutorial_backing.tileset->numTile;
 
 	VDP_setPalette(PAL0, tutorial_backing.palette->data);
@@ -157,14 +157,14 @@ void Part2Start()
 		VDP_clearTextArea(0, 0, 40, 28);
 
 		//VDP_setPalette(PAL0, ingame_back.palette->data);
-		VDP_drawImageEx(PLAN_B, &tutorial_backing_2, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA);
+		VDP_drawImageEx(PLAN_B, &tutorial_backing_2, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 		ind += tutorial_backing_2.tileset->numTile;
 
 		VDP_setPalette(PAL0, tutorial_backing_2.palette->data);
 
 
 		VDP_setPalette(PAL1, atoms.palette->data);
-		VDP_loadTileSet(atoms.tileset, ind, CPU);
+		VDP_loadTileSet(atoms.tileset, ind, DMA_QUEUE);
 
 		m_AtomTileStart = ind;
 		ind += atoms.tileset->numTile;

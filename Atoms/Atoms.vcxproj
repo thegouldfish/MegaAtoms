@@ -85,16 +85,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="inc\atoms.h" />
+    <ClInclude Include="inc\ChallengeModeHighScoreState.h" />
+    <ClInclude Include="inc\ChallengeModeSetNameState.h" />
+    <ClInclude Include="inc\ChallengeModeTutorialState.h" />
     <ClInclude Include="inc\GamePlay.h" />
     <ClInclude Include="inc\GameSelectState.h" />
     <ClInclude Include="inc\GameState.h" />
     <ClInclude Include="inc\AtomsGameState.h" />
     <ClInclude Include="inc\PadHelper.h" />
     <ClInclude Include="inc\PlayerSelectState.h" />
-    <ClInclude Include="inc\Prototype1.h" />
     <ClInclude Include="inc\Prototype2.h" />
     <ClInclude Include="inc\Prototype2GameOverState.h" />
     <ClInclude Include="inc\SimpleState.h" />
+    <ClInclude Include="inc\TextHelpers.h" />
     <ClInclude Include="inc\Title.h" />
     <ClInclude Include="inc\TutorialState.h" />
     <ClInclude Include="inc\WinnerScreen.h" />
@@ -117,14 +120,17 @@
     <ClCompile Include="src\atoms.c" />
     <ClCompile Include="src\boot\rom_head.c" />
     <ClCompile Include="src\AtomsGameState.c" />
+    <ClCompile Include="src\ChallengeModeHighScoreState.c" />
+    <ClCompile Include="src\ChallengeModeSetNameState.c" />
+    <ClCompile Include="src\ChallengeModeTutorialState.c" />
     <ClCompile Include="src\GamePlay.c" />
     <ClCompile Include="src\GameSelectState.c" />
     <ClCompile Include="src\PadHelper.c" />
     <ClCompile Include="src\PlayerSelectState.c" />
-    <ClCompile Include="src\Prototype1.c" />
     <ClCompile Include="src\Prototype2.c" />
     <ClCompile Include="src\Prototype2GameOverState.c" />
     <ClCompile Include="src\SimpleState.c" />
+    <ClCompile Include="src\TextHelpers.c" />
     <ClCompile Include="src\Title.c" />
     <ClCompile Include="src\TutorialState.c" />
     <ClCompile Include="src\WinnerScreen.c" />

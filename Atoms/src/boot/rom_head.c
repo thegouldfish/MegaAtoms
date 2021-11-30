@@ -23,9 +23,9 @@ const struct
     char region[16];                /* Country Support (16) */
 } rom_header = {
     "SEGA MEGA DRIVE ",
-    "GOULDFISHONGAMES",
-    "MegaAtoms                                       ",
-    "MegaAtoms                                       ",
+    "(C)GouldFish",
+    "MegaAtoms!",
+    "MegaAtoms!",
     "GM 00000000-00",
     0x0000,
     "JD              ",
@@ -38,6 +38,6 @@ const struct
     0x00200000,
     0x002001FF,
     "            ",
-    "MegaAtoms                               ",
+    "MegaAtoms By GouldFish On games",
     "JUE             "
 };

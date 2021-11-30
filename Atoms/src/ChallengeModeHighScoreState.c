@@ -36,13 +36,17 @@ void ChallengeModeHighScoreStateStart()
 
 	// Set palette to black
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
+	
+
+	SYS_enableInts();
+
 	int ind = TILE_USERINDEX;
 
 	VDP_clearPlan(PLAN_A, TRUE);
-	VDP_drawImageEx(PLAN_B, &HighScoreTable_Background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, TRUE);
+	VDP_drawImageEx(PLAN_B, &HighScoreTable_Background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 	ind += HighScoreTable_Background.tileset->numTile;
 	
-	VDP_loadTileSet(med_font.tileset, ind, CPU);
+	VDP_loadTileSet(med_font.tileset, ind, DMA_QUEUE);
 
 	m_FontStart = ind;
 	ind += atoms.tileset->numTile;
@@ -70,13 +74,13 @@ void ChallengeModeHighScoreStateStart()
 	VDP_drawText("to", 34, 24);
 	VDP_drawText("start", 34, 25);
 	
-	SYS_enableInts();
+	
 
 	SPR_update();
 
 
 	u16 palette[64];
-	memset(palette, 0, 64);
+	memset(palette, 0, 64 * 2);
 
 	
 	memcpy(&palette[0], HighScoreTable_Background.palette->data, 16 * 2);

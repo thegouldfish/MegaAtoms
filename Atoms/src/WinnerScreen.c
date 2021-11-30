@@ -15,7 +15,7 @@ static u8 m_DelayTime = 20;
 void WinnerScreenStart()
 {
 	// disable interrupt when accessing VDP
-	SYS_disableInts();
+	//SYS_disableInts();
 
 	// Set palette to black
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
@@ -24,7 +24,7 @@ void WinnerScreenStart()
 
 
 	//VDP_setPalette(PAL0, ingame_back.palette->data);
-	VDP_drawImageEx(PLAN_B, &winner_background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA);
+	VDP_drawImageEx(PLAN_B, &winner_background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 	ind += winner_background.tileset->numTile;
 
 	
@@ -84,10 +84,10 @@ void WinnerScreenStart()
 	}
 	
 	
-	VDP_drawImageEx(PLAN_A, winner, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA);
+	VDP_drawImageEx(PLAN_A, winner, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, ind), 0, 0, FALSE, DMA_QUEUE);
 	ind += winner->tileset->numTile;
 
-	SYS_enableInts();
+	//SYS_enableInts();
 	u16 palette[64];
 
 	memcpy(&palette[0], winner_background.palette->data, 16 * 2);
